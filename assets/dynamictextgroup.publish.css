@@ -1,0 +1,87 @@
+/* * 	
+ * *	Dynamic Text Group styling
+ * *	@author: Brock Petrie, brockpetrie@gmail.com
+ * *	@source: http://github.com/brockpetrie/datetime
+ * */
+
+.field-dynamictextgroup div.invalid {
+	padding: 0.5em 1em 0.75em;
+	background-color: #D42;
+	border: 1px solid #C31;
+	border-top-width: 0;
+	border-bottom-color: #B21;
+	}
+	.field-dynamictextgroup div.invalid label { margin-top: 1px; }
+	.field-dynamictextgroup div.invalid p {
+		margin: 0;
+		padding: 0;
+		background: none;
+		border: none;
+		}
+	
+.field-dynamictextgroup div.stage ul.selection li { padding-right: 0; }
+
+.field-dynamictextgroup div.stage span {
+	padding: 3px 42px 4px 16px;
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	}
+
+.field-dynamictextgroup div.stage span.fields {
+	background:none !important;
+	padding: 0px;
+	width: 100%;
+	}
+.field-dynamictextgroup div.stage span.fieldHolder {
+	background:none !important;
+	padding: 0 3px 0 0;
+	width: 50%;
+	float: left;
+	}
+
+.field-dynamictextgroup div.stage div.clear {
+	clear:both;
+	}
+
+.field-dynamictextgroup div.stage span.fields.focus input {
+	box-shadow: 0 0 5px #a7a7a7;
+	-webkit-box-shadow: 0 0 5px #a7a7a7;
+	-moz-box-shadow: 0 0 5px #a7a7a7;
+	}
+
+.field-dynamictextgroup div.stage span.fields input {
+	width: 100%;
+	font-size: 109.09%;
+	border: 1px solid #C2C2C2;
+	background: #fff !important;
+	padding: 4px 5px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-box-shadow: inset 1px 1px 1px #f0f0f0;
+	-moz-box-shadow: inset 1px 1px 1px #f0f0f0;
+	box-shadow: inset 1px 1px 1px #f0f0f0;
+	-webkit-border-radius: 1px;
+	-moz-border-radius: 1px;
+	border-radius: 1px;
+	float: left;
+	}
+
+.field-dynamictextgroup div.stage span.fields input:focus {
+	outline: none;
+	}
+
+.field-dynamictextgroup div.stage span.fields em.label {
+	color: #C2C2C2;
+	position: absolute;
+	top: 4px;
+	right: 10px;
+	margin-top: 0;
+	}
+
+.field-dynamictextgroup div.stage span.fields em.end.label {
+	top: 28px;
+	}
