@@ -12,7 +12,6 @@
 	var deletions = new Array();
 	
 	function parseSchema(schema) {
-		//First Name//first-name//50%//false||Last Name//last-name//50%//false||
 		if (schema != '') {
 			schema = schema.split('||');
 			var ct = schema.length;
@@ -20,8 +19,6 @@
 				var itm = schema[i].split('//');
 				fieldMaster(null, itm[0], itm[1], itm[2], itm[3]);
 			}
-		} else {
-			fieldMaster();
 		}
 	}
 	
@@ -50,16 +47,12 @@
 			schema[i] += $('input', $('ul', targ)).attr('checked');
 			
 			if ($(targ).hasClass('new')) {
-				//var appendage = $('.tfield', targ).attr('value')+'||';
-				//_a.attr('value', (_a.attr('value') + appendage));
 				additions.push($('.tfield', targ).attr('value'));
 			} else {
 				var orig = $('#original', targ).attr('value');
 				var val = $('.tfield', targ).attr('value');
 				if (orig != val) {
 					renames.push($('.tfield', targ).attr('id')+'//'+val);
-					//]var appendage = $('.tfield', targ).attr('id')+'//'+val;
-					//_r.attr('value', (_r.attr('value') + appendage));
 				}
 			}
 		}
@@ -74,17 +67,16 @@
 		var emptyspace = false;
 		
 		if (del) {
-			// remove field
+			// Remove field
 			emptyspace = $(del).innerWidth()/(boxOrder.length-1);
 			if (!$(del).hasClass('new')) {
-				//var appendage = $('.tfield', $(del)).attr('id')+'||';
-				//$('#delfields').attr('value', ($('#delfields').attr('value') + appendage));
 				deletions.push($('.tfield', $(del)).attr('id'));
 			}
 			$(del).remove();
+			buildSchema();
 			
 		} else {
-			// add field
+			// Add field
 			var __new = fLabel ? '' : ' new';
 			var boxy = $('<div></div>').attr('id', 'box'+(boxOrder.length+1)).addClass('box'+__new).html('<div class="inner"><div class="handle"></div></div>');
 			var __boxlabel = fLabel ? fLabel : 'Label';
@@ -125,7 +117,7 @@
 		
 		refreshStage();
 	
-		// adjust widths
+		// Adjust widths
 		if (!fWidth) {
 			var offsetw = 0;
 			for (var i=0; i<oldOrder; i++) {
@@ -146,7 +138,7 @@
 	}
 	
 	function initResize() {
-		// set resizeables
+		// Set resizeables
 		for (var i=0; i < (boxOrder.length-1); i++) {
 			var targ = $(".box", "#stage")[i];
 			var maxw = $(targ).outerWidth(true) + $($(".box", "#stage")[i+1]).outerWidth(true) - minw;
@@ -160,7 +152,7 @@
 	}
 	
 	function refreshStage() {
-		// reinitiate the sortable object
+		// Reinitiate the sortable object
 		$("#stage").sortable({
 			placeholder	: 'placeholder',
 			handle		: '.handle',

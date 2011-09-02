@@ -14,15 +14,19 @@ This field provides a method to dynamically add a text field or text field group
 2. Enable the extension from the Extensions page
 
 ## Field Editor
-The Field Editor replaces the old custom schema field, and allows for easy manipulation and customization of each field's instance. When adding a new subfield, the label MUST be unique or it'll crash and burn. This is because it names the SQL columns based on your input, and SQL column names must be unique.
+The Field Editor in v2 replaces the old custom schema field, and allows for easy manipulation and customization of each field's instance. When adding a new subfield, the label MUST be unique or it'll crash and burn. This is because it names the SQL columns based on your input, and SQL column names must be unique.
 
-## Roadmap
+## To-do
+- Wrap my head around how params could work with this field
 - Get filtering working
+- Allow for specific subfields to be required
+- Warn and prevent user from trying to save subfields with duplicate labels
+- [DONE] Implement Field Editor
 
 ## Change log
 
-**Version 2.0dev**
-- Implemented the Field Editor, allowing easy manipulation and customization of each field's instance
+**Version 2.0dev1**
+- Implemented the Field Editor
 
 **Version 1.0**
 - Initial release.
