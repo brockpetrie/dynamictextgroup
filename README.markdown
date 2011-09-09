@@ -24,12 +24,12 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 - [DONE] Implement Field Editor
 
 ## Change log
-**Version 2.0dev2**
+**Version 2.0dev2** 
 - Warn and [sort of] prevent user from trying to save subfields with duplicate labels. Need to make it foolproof, but at least it throws a warning now.
 - Data is sent and stored as JSON now
 
-**Version 2.0dev1**
+**Version 2.0dev1** 
 - Implemented the Field Editor
 
-**Version 1.0**
+**Version 1.0** 
 - Initial release.
