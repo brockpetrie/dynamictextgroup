@@ -2,7 +2,7 @@
 
 	class Textgroup {
 		
-		public static function createNewTextGroup($element, $fieldCount=2, $values=NULL, $class=NULL, $labels=NULL, $handles, $widths=NULL) {
+		public static function createNewTextGroup($element, $fieldCount=2, $values=NULL, $class=NULL, $labels=NULL, $handles, $widths=NULL, $required=NULL) {
 			// Additional classes
 			$classes = array();
 			if($class) {
@@ -13,7 +13,7 @@
 			$fields = '';
 			for ($i=0; $i<$fieldCount; $i++) {
 				$fieldVal = ($values != NULL && $values[$i] != ' ') ? $values[$i] : NULL;
-				$fields .= self::__createTextField($element, $handles[$i], $fieldVal, $labels[$i], $widths[$i]);
+				$fields .= self::__createTextField($element, $handles[$i], $fieldVal, $labels[$i], $widths[$i], $required[$i]);
 			}
 			
 			// Create element
@@ -26,10 +26,11 @@
 			);
 		}
 		
-		private static function __createTextField($element, $handle, $textvalue, $label=NULL, $width=NULL) {
+		private static function __createTextField($element, $handle, $textvalue, $label=NULL, $width=NULL, $required=NULL) {
 			// Generate field
-			$width = 'style="width:'. $width*100 .'% !important;"';
-			$label = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">'.$label.'</label>';
+			$width = 'style="width:'. $width .'% !important;"';
+			$required = $required ? ' <span class="req">*</span>' : '';
+			$label = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $required . '</label>';
 			return '<span class="fieldHolder '. $handle .'-holder" '. $width .'>'. $label .'<input type="text" name="fields['. $element .']['. $handle .'][]" value="'. $textvalue .'" class="'. $handle .' '. $class .'" /></span>';
 		}
 	}

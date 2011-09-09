@@ -28,7 +28,7 @@
 		public function about() {
 			return array(
 				'name' => 'Dynamic Text Group',
-				'version' => '2.0',
+				'version' => '1.0',
 				'release-date' => NULL,
 				'author' => array(
 					'name' => 'Brock Petrie',

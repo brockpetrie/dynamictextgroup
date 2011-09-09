@@ -5,26 +5,11 @@
 * */
 
 
-/*body {
-	color:#999;
-	font-family:Arial, Helvetica, sans-serif;
-	font-family:Lucinda Grande, Tahoma, Geneva, sans-serif;
-	font-size:11px;
-	margin:0;
-	padding:40px;
-	}
-a {
-	color: #62c6d2;
-	text-decoration:none;
-	}
-a:hover {
-	color: #3eb4c2;
-	}*/
 #stage {
-	width:780px;
-	/*border:1px solid #ddd;
-	padding:2px;*/
+	width:100%;
 	float:left;
+	position:absolute;
+	/*background:rgba(255,100,200,0.5);*/
 	}
 .box {
 	width:100%;
@@ -42,7 +27,6 @@ a:hover {
 		height:100%;
 		width:15px;
 		background:url(images/dropdown.png) center center no-repeat;
-		/*float:right;*/
 		right:3px;
 		top:0px;
 		margin:0 auto;
@@ -51,27 +35,28 @@ a:hover {
 		z-index:999;
 		}
 		.options ul {
+			position:absolute;
 			display:none;
 			padding:10px;
 			margin:0;
-			position:absolute;
+			width:140px;
 			right:0px;
 			top:23px;
 			background:#333;
 			color:#888;
 			border:1px solid #222;
-			width:100px;
 			cursor:auto;
 			z-index:1000;
+			list-style:none;
 			}
 		.options:hover { background-image:url(images/dropdown-open.png); }	
 		.options:hover ul { display:block; }	
 		.options li {
-		font-family:Lucinda Grande, Tahoma, Geneva, sans-serif;
+			font-family:Lucinda Grande, Tahoma, Geneva, sans-serif;
 			list-style:none;
-			padding:0 0 6px 0;
+			padding:0 0 8px 0;
 			margin:0 0 8px 0;
-			border-bottom:1px solid #555;
+			border-bottom:1px solid #444;
 			line-height:1em;
 			}
 		.options li:last-child {
@@ -79,6 +64,9 @@ a:hover {
 			margin:0;
 			padding:0;
 			}
+			
+		.options label { margin:0; }
+		.options input[type='checkbox'] { margin-right:5px; }
 .placeholder {
 	width:10%;
 	float:left;
@@ -97,47 +85,117 @@ a:hover {
 		-moz-box-shadow: 0 0 5px #999;
 		}
 	.inner:hover {
+		box-shadow: 0 0 5px #666;
+		-webkit-box-shadow: 0 0 5px #666;
+		-moz-box-shadow: 0 0 5px #666;
 		}
+		.box.new .inner {
+			}
+		
 	.box span {
 		position:relative;
 		}
-	.box input[type="text"] {
+	.box .tfield {
 		font-family:Lucinda Grande, Tahoma, Geneva, sans-serif;
 		color:#887;
 		font-size:11px;
-		display:inline;
-		border:none;
+		height:14px;
 		background:none;
-		padding:5px 0;
+		border:none;
+		padding:4px 3px;
 		width:40%;
 		margin:0;
+		position:absolute;
+		left:12px;
+		top:5px;
 		}
-	.box input:focus {
-		padding:4px 1px;
-		border:1px solid #ddd;
-		border-top:1px solid #bbb;
-		background:#fcfbf5;
-		font-family:Lucinda Grande, Tahoma, Geneva, sans-serif;
-		color:#444;
-		font-style:normal;
+	.box .tfield:focus {
+		padding:3px 2px;
+		border:1px solid #e0e0e0;
+		background:#fcfcfc;
+		-moz-box-shadow:inset 0 1px 2px #eaeaea;
+		-webkit-box-shadow:inset 0 1px 2px #eaeaea;
+		box-shadow:inset 0 1px 2px #eaeaea;
+		outline:none;
 		}
+		
+	.box.error .inner { background:#FFEFED; }
+	.box.error .tfield { color:#d43; }
 		
 .ui-resizable { position: relative;}
 .ui-resizable-handle {
-position: absolute;font-size: 0.1px;z-index: 99999; display: block;
-background-image:url(data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=);
-}
+	position: absolute;font-size: 0.1px;z-index: 99999; display: block;
+	background-image:url(data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=);
+	}
 .ui-resizable-e { cursor: col-resize; width: 7px; right: -5px; top: 0; height: 100%; }
 .ui-resizable-disabled .ui-resizable-e { display:none; }
 
 #stageHolder {
 	background:#ccb;
 	padding:4px;
+	height:64px;
 	border:1px solid rgba(170,170,153,.3);
-	width:780px;
 	margin-bottom:15px;
+	position:relative;
 	}
-#add {
-	margin-top:4px;
-	float:right;
+
+.dtgButton {
+	background-color:#000;
+	color:#FFF;
+	cursor:pointer;
+	/*padding:4px 10px 5px;
+	line-height:0.99;*/
+	padding:.4em 1em .5em 1em;
+	line-height:2em;
+	font:10px/11px Lucida Grande, Leelawadee, Tahoma, Verdana, sans-serif;
+	border-radius:1em;
+	-moz-border-radius:1em;
+	-webkit-border-radius:1em;
+	text-decoration:none;
+	display:block;
+	text-align:center;
 	}
+	.dtgButton:hover {
+		background-color:#FFF;
+		color:#000;
+		}
+
+	.dtgButton#add {
+		float:right;
+		position:absolute;
+		right:6px;
+		bottom:6px;
+		color:#fff;
+		background:#81b934;
+		}
+		.dtgButton#add:hover {
+			color:#fff;
+			background:#75AB2B;
+			}
+	.dtgButton.del {
+		font-size:.8em;
+		}
+		.dtgButton.del:hover {
+			background:#d43;
+			color:#fff;
+			}
+	
+#messages {
+	float:left;
+	position:absolute;
+	left:7px;
+	bottom:7px;
+	}
+	.msg {
+		line-height:1;
+		float:left;
+		height:10px;
+		padding:4px 4px 3px 4px;
+		font-size:9px;
+		-moz-border-radius: 3px;
+		border-radius: 3px;
+		}
+	.msgbad {
+		background:#d43;
+		color:#fff;
+		}

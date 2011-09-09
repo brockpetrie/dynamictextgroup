@@ -59,16 +59,17 @@
 			// Field Editor
 			if ($this->get('id')) {
 				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery-ui-1.8.16.custom.min.js', 101, false);
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery.ui.resizable.js', 101, false);
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 103, false);
-				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 104, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/json2.js', 102, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery.ui.resizable.js', 103, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 104, false);
+				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 105, false);
 				
-				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value="'.$this->get('schema').'" />';
+				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
 				$tblocks .= '<input type="hidden" id="addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
 				$tblocks .= '<input type="hidden" id="delfields" name="fields['.$this->get('sortorder').'][delfields]" value="" />';
 				$tblocks .= '<input type="hidden" id="renfields" name="fields['.$this->get('sortorder').'][renfields]" value="" />';
 		
-				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div id="stageHolder"><div id="stage"></div><button value="addfield" id="add">Add Field</button><br clear="all" /></div>'.$tblocks);
+				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div id="stageHolder"><div id="stage"></div><div id="messages"></div><a class="dtgButton" id="add">Add Field</a><br clear="all" /></div>'.$tblocks);
 				$wrapper->appendChild($fieldset);
 			} else {
 				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend>Please save the section to enable the Field Editor.<br /><br />');
@@ -114,41 +115,31 @@
 			
 			// Parse schema
 			if ($this->get('schema') != '') {
-				$schema = explode('||', $this->get('schema'));
-				$fields['fieldcount'] = count($schema);
+				$schema = json_decode($this->get('schema'));
+				$ct = count($schema->labels);
+				foreach ($schema->labels as $label) $schema->handles[] = Lang::createHandle($label);
+				$totalW = 100;
+				foreach ($schema->widths as $w) $totalW -= $w;
+				$schema->widths[$ct-1] += $totalW;
 				
-				for ($i=0; $i<count($schema); $i++) {
-					$row = explode('//', $schema[$i]);
-					array_splice($row, 1, 0, Lang::createHandle($row[0]));
-					$schema[$i] = implode('//', $row);
-				}
-				$fields['schema'] = implode('||', $schema);
-			} else {
-				//$fields['schema'] = '';
-				//$fields['fieldcount'] = 1;
+				$fields['fieldcount'] = $ct;
+				$fields['schema'] = json_encode($schema);
 			}
 			
 			// Parse rename data
 			if ($this->get('renfields') != '') {
-				$renfields = explode('||', $this->get('renfields'));
-				for ($r=0; $r<count($renfields); $r++) {
-					$singlet = explode('//', $renfields[$r]);
-					self::__alterTable(2, $singlet[0], Lang::createHandle($singlet[1]));
-				}
+				$renfields = json_decode($this->get('renfields'));
+				foreach ($renfields->handles as $key=>$rename) self::__alterTable(2, $rename, Lang::createHandle($renfields->labels[$key]));
 			}
 			// Parse delete data
 			if ($this->get('delfields') != '') {
-				$delfields = explode('||', $this->get('delfields'));
-				for ($d=0; $d<count($delfields); $d++) {
-					self::__alterTable(0, $delfields[$d]);
-				}
+				$delfields = json_decode($this->get('delfields'));
+				foreach ($delfields->handles as $deletion) self::__alterTable(0, $deletion);
 			}
 			// Parse add data
 			if ($this->get('addfields') != '') {
-				$addfields = explode('||', $this->get('addfields'));
-				for ($a=0; $a<count($addfields); $a++) {
-					self::__alterTable(1, Lang::createHandle($addfields[$a]));
-				}
+				$addfields = json_decode($this->get('addfields'));
+				foreach ($addfields->labels as $addition) self::__alterTable(1, Lang::createHandle($addition));
 			}
 	
 			// Save new stage settings for this field
@@ -208,22 +199,9 @@
 				$settings[] = 'single';
 			}
 			
-			// Parse schema
-			$fieldLabels = array();
-			$fieldHandles = array();
-			$fieldWidths = array();
-			$fieldReqs = array();
-			$schema = explode('||', $this->get('schema'));
+			$schema = json_decode($this->get('schema'));
 			
-			foreach ($schema as &$field) {
-				$field = explode('//', $field);
-				$fieldLabels[] = $field[0];
-				$fieldHandles[] = $field[1];
-				$fieldWidths[] = $field[2];
-				$fieldReqs[] = $field[3];
-			}
-			
-			$sampling = $fieldHandles[0];
+			$sampling = $schema->handles[0];
 			$entryCount = count($data[$sampling]);
 			$fieldCount = $this->get('fieldcount');
 			
@@ -233,20 +211,20 @@
 				foreach ($data as &$row) { if (!is_array($row)) $row = array($row); }
 				
 				for($i=0; $i<$entryCount; $i++) {
-					foreach ($data as $k => &$row) {
-						$entryValues[$i][] = $row[$i];
+					foreach ($schema->handles as $handle) {
+						$entryValues[$i][] = $data[$handle][$i];
 					}
-					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $fieldLabels, $fieldHandles, $fieldWidths);
+					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $schema->labels, $schema->handles, $schema->widths, $schema->required);
 				}
 			}
 			
 			// Blank entry
 			else {
-				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $fieldLabels, $fieldHandles, $fieldWidths);
+				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema->labels,  $schema->handles, $schema->widths);
 			}
 			
 			// Add template
-			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $fieldLabels, $fieldHandles, $fieldWidths);
+			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema->labels,  $schema->handles, $schema->widths);
 		
 			// Create stage
 			$stage = Stage::create('dynamictextgroup', $this->get('id'), implode($settings, ' '), $content);
@@ -451,24 +429,21 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#appendFormattedElement * * */
 		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id) {
+			// Get field properties and decode schema
 			$fieldCount = $this->get('fieldcount');
-			
-			// Parse result data
-			$keys = array_keys($data);
-			$sampling = $keys[0];
+			$schema = json_decode($this->get('schema'));
+			$sampling = $schema->handles[0];
 			$entryCount = count($data[$sampling]);
-						
+				
+			// Parse data
 			$textgroup = new XMLElement($this->get('element_name'));
-			
+			foreach ($data as &$row) { if (!is_array($row)) $row = array($row); }
 			for($i=0; $i<$entryCount; $i++) {
 				$item = new XMLElement('item');
 				$empty = true;
-				foreach ($data as $k => &$field) {
-					if(!is_array($field)) $field = array($field);
-					$val = $field[$i] != ' ' ? General::sanitize($field[$i]) : '';
-					$item->appendChild(
-						${$k} = new XMLElement($k, $val)
-					);
+				foreach ($schema->handles as $handle) {
+					$val = $data[$handle][$i] != ' ' ? General::sanitize($data[$handle][$i]) : '';
+					$item->appendChild(new XMLElement($handle, $val));
 				}
 				$textgroup->appendChild($item);
 			}

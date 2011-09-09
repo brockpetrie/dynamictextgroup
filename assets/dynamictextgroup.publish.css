@@ -75,13 +75,15 @@
 	}
 
 .field-dynamictextgroup div.stage span.fields em.label {
-	color: #C2C2C2;
+	color: #BBB;
 	position: absolute;
 	top: 4px;
 	right: 10px;
 	margin-top: 0;
 	}
-
+	span.req {
+		color:#d43 !important;
+		}
 .field-dynamictextgroup div.stage span.fields em.end.label {
 	top: 28px;
 	}

@@ -1,8 +1,8 @@
 # Dynamic Text Group
 
-- Version: 2.0dev
+- Version: 2.0dev2
 - Author: [Brock Petrie](http://www.brockpetrie.com)
-- Build Date: 2011-09-02
+- Build Date: 2011-09-09
 - Requirements: Symphony 2.2
 
 ## Description
@@ -20,10 +20,13 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 - Wrap my head around how params could work with this field
 - Get filtering working
 - Allow for specific subfields to be required
-- Warn and prevent user from trying to save subfields with duplicate labels
+- [DONE] Throw a warning when user has duplicate field labels
 - [DONE] Implement Field Editor
 
 ## Change log
+**Version 2.0dev2**
+- Warn and [sort of] prevent user from trying to save subfields with duplicate labels. Need to make it foolproof, but at least it throws a warning now.
+- Data is sent and stored as JSON now
 
 **Version 2.0dev1**
 - Implemented the Field Editor
