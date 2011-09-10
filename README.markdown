@@ -1,8 +1,8 @@
 # Dynamic Text Group
 
--  Version: 2.0dev2
+-  Version: 2.0dev3
 -  Author: [Brock Petrie](http://www.brockpetrie.com)
--  Build Date: 2011-09-09
+-  Build Date: 2011-09-10
 -  Requirements: Symphony 2.2
 
 ## Description
@@ -22,10 +22,14 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 ## To-do
 
 -  Wrap my head around how params could work with this field
--  Get filtering working
+-  Add more advanced filtering options
 -  Make duplicate field creation impossible.
 
 ## Change log
+
+**Version 2.0dev3**
+
+-  Added basic filtering capability. Accepted filter data is 'handle:value' (e.g. first-name:Brock), where 'handle' is the handle of one of your subfields, and 'value' is the value of said subfield.
 
 **Version 2.0dev2** 
 

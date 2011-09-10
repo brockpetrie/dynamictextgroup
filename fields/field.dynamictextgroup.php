@@ -356,77 +356,34 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#buildDSRetrivalSQL * * */
-		
 		/*
-		**	Accepted Filter options at this stage:
-		**
-		**	colour			Key
-		**	value: red		Value
-		**	key-equals: 	colour=red	Key Equals
+		**	Accepted filter:
+		**	handle:value	(e.g. first-name:Brock)
+		**  Where 'handle' is equal to the handle of a subfield, and 'value' is equal to the input of said subfield. All entries with a matching value in this subfield will be returned.
 		*/
 		public function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation = false) {
-			$id = $this->get('id');
-			$this->_key++;
-			$fieldCount = $this->get('fieldcount');
+			$field_id = $this->get('id');
 			
-			// Match label
-			if (preg_match('/:/', $data[0])) {
-				$filterField = explode(':', $data[0]);
-				if (!is_array($data)) $data = array($data);
-				$data = implode("', '", $data);
-				
-				// User has not declared a custom label (e.g. 'textfield2')
-				if (preg_match('/textfield/', $filterField[0])) {
-					$joins .= "
-						LEFT JOIN
-							`tbl_entries_data_{$id}` AS t{$id}_{$this->_key}
-						ON
-							(e.id = t{$id}_{$this->_key}.entry_id)";
-					$where .= "
-						AND	(
-							t{$id}_{$this->_key}.{$filterField[0]} IN ('{$data}')
-						)";
-					
-				// User has declared a custom label
-				} else {
-					$schema = $this->get('schema');
-					if ($schema && $schema != '') {
-						$fieldLabels = array();
-						$fieldWidths = array();
-						
-						$splitMe = explode('|',$schema);
-						
-						foreach ($splitMe as $i => $field) {
-							$index = $i+1;
-							$splitAgain = explode(',', $field);
-							$fieldLabels[$i] = ($splitAgain[0] && $splitAgain[0] != null) ? General::sanitize($splitAgain[0]) : null;
-						}
-					} else {	
-						$fieldLabels = null;
-					}
-					
-				}
-			}
-			
-			// Match any value
-			else {
-				if (!is_array($data)) $data = array($data);
-				$data = implode("', '", $data);
-
+			if (preg_match('/.*:.*/', $data[0])) {
+				$this->_key++;
 				$joins .= "
 					LEFT JOIN
-						`tbl_entries_data_{$id}` AS t{$id}_{$this->_key}
+						`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
 					ON
-						(e.id = t{$id}_{$this->_key}.entry_id)";
+						(e.id = t{$field_id}_{$this->_key}.entry_id)
+				";
+				
+				$data[0] = explode(':', trim($this->cleanValue($data[0])));
+				$handle = $data[0][0];
+				$value = $data[0][1];
+				
 				$where .= "
-					AND	(
-						t{$id}_{$this->_key}.textfield1 IN ('{$data}')
-						OR
-						t{$id}_{$this->_key}.textfield2 IN ('{$data}')
-						OR
-						t{$id}_{$this->_key}.textfield3 IN ('{$data}')
-					)";
+					AND (
+						`t{$field_id}_{$this->_key}`.`{$handle}` IN ('{$value}')
+					)
+				";
 			}
+
 			return true;
 		}
 	
