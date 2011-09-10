@@ -23,15 +23,13 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 
 -  Wrap my head around how params could work with this field
 -  Get filtering working
--  DONE: Allow for specific subfields to be required
--  DONE: Throw a warning when user has duplicate field labels
--  DONE: Implement Field Editor
+-  Make duplicate field creation impossible.
 
 ## Change log
 
 **Version 2.0dev2** 
 
--  Allow for specific subfields to be required
+-  Added option to allow for specific subfields to be required (not left empty).
 -  Warn and (sort of) prevent user from trying to save subfields with duplicate labels. Need to make it foolproof, but at least it throws a warning now.
 -  Data is now sent and stored as JSON.
 
