@@ -200,7 +200,6 @@
 			}
 			
 			$schema = json_decode($this->get('schema'));
-			
 			$sampling = $schema->handles[0];
 			$entryCount = count($data[$sampling]);
 			$fieldCount = $this->get('fieldcount');
@@ -217,14 +216,13 @@
 					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $schema->labels, $schema->handles, $schema->widths, $schema->required);
 				}
 			}
-			
 			// Blank entry
 			else {
-				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema->labels,  $schema->handles, $schema->widths);
+				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema->labels,  $schema->handles, $schema->widths, $schema->required);
 			}
 			
 			// Add template
-			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema->labels,  $schema->handles, $schema->widths);
+			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema->labels,  $schema->handles, $schema->widths, $schema->required);
 		
 			// Create stage
 			$stage = Stage::create('dynamictextgroup', $this->get('id'), implode($settings, ' '), $content);
@@ -235,9 +233,7 @@
 			$holder->appendChild($label);
 			
 			// Append Stage
-			if($stage) {
-				$holder->appendChild($stage);
-			}
+			if($stage) $holder->appendChild($stage);
 			
 			if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($holder, $flagWithError));
 			else $wrapper->appendChild($holder);
@@ -248,15 +244,30 @@
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
 			$message = __("'%s' is a required field.", array($this->get('label')));
 			
-			if($this->get('required') == 'yes'){
-				$empty = true;
-				foreach ($data as $k => $field) {
-					foreach ($field as $row) {
-						if ($row != '') $empty = false;
+			$schema = json_decode($this->get('schema'));
+			$sampling = $schema->handles[0];
+			$entryCount = count($data[$sampling]);
+			
+			$empty = true;
+			
+			for($i=0; $i<$entryCount; $i++) {
+				$emptyRow = true;
+				$emptyReq = false;
+				foreach ($schema->handles as $h=>$handle) {
+					$req = $schema->required[$h] ? true : false;
+					if ($req && $data[$handle][$i] == '') {
+						$emptyReq = true;
+					} else if ($data[$handle][$i] != '') {
+						$emptyRow = false;
 					}
 				}
-				if ($empty) return self::__MISSING_FIELDS__;
+				if (!$emptyRow && $emptyReq) {
+					$message = __("'%s' contains required fields that are empty.", array($this->get('label')));
+					return self::__MISSING_FIELDS__;
+				}
 			}
+			
+			if ($empty && $this->get('required') == 'yes') return self::__MISSING_FIELDS__;
 			
 			return self::__OK__;
 		}

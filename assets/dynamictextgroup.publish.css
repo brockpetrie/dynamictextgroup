@@ -5,13 +5,15 @@
  * */
 
 .field-dynamictextgroup div.invalid {
-	padding: 0.5em 1em 0.75em;
+	padding: 0.75em 1em 0.75em;
 	background-color: #D42;
 	border: 1px solid #C31;
 	border-top-width: 0;
 	border-bottom-color: #B21;
 	}
-	.field-dynamictextgroup div.invalid label { margin-top: 1px; }
+	.field-dynamictextgroup div.invalid label { border:none; margin-top:1px; margin-bottom:1.5em; }
+	.field-dynamictextgroup div.invalid label i { top:0; right:0; }
+	.field-dynamictextgroup div.invalid .stage { margin-bottom:0.75em; }
 	.field-dynamictextgroup div.invalid p {
 		margin: 0;
 		padding: 0;
@@ -69,6 +71,10 @@
 	border-radius: 1px;
 	float: left;
 	}
+	.field-dynamictextgroup .invalid .req input[value=""] {
+		border: 1px solid #d42 !important;
+		}
+	
 
 .field-dynamictextgroup div.stage span.fields input:focus {
 	outline: none;
@@ -77,13 +83,12 @@
 .field-dynamictextgroup div.stage span.fields em.label {
 	color: #BBB;
 	position: absolute;
-	top: 4px;
-	right: 10px;
+	top:0;
+	right:10px;
 	margin-top: 0;
 	}
-	span.req {
-		color:#d43 !important;
-		}
+	span.req { color:#d43 !important; }
+	.invalid span.req { color:#fff !important; }
 .field-dynamictextgroup div.stage span.fields em.end.label {
 	top: 28px;
 	}

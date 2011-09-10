@@ -29,9 +29,10 @@
 		private static function __createTextField($element, $handle, $textvalue, $label=NULL, $width=NULL, $required=NULL) {
 			// Generate field
 			$width = 'style="width:'. $width .'% !important;"';
-			$required = $required ? ' <span class="req">*</span>' : '';
-			$label = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $required . '</label>';
-			return '<span class="fieldHolder '. $handle .'-holder" '. $width .'>'. $label .'<input type="text" name="fields['. $element .']['. $handle .'][]" value="'. $textvalue .'" class="'. $handle .' '. $class .'" /></span>';
+			$reqLabelAppendage = $required ? ' <span class="req">*</span>' : '';
+			$class .= $required ? ' req' : '';
+			$label = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
+			return '<span class="fieldHolder '. $handle .'-holder'.$class.'" '. $width .'>'. $label .'<input type="text" name="fields['. $element .']['. $handle .'][]" value="'. $textvalue .'" class="field-'. $handle .'" /></span>';
 		}
 	}
 	
