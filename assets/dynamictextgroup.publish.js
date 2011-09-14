@@ -15,10 +15,7 @@
 				stage = manager.find('div.stage'),
 				selection = stage.find('ul.selection');
 			
-			stage.bind('constructstop', function() {
-				$('.styled').customStyle();
-			});
-			stage.bind('emptyclone', function() {
+			stage.bind('constructanim', function() {
 				$('.styled').customStyle();
 			});
 			
