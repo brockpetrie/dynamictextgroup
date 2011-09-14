@@ -1,8 +1,8 @@
 # Dynamic Text Group
 
--  Version: 2.0dev3
+-  Version: 2.0dev4
 -  Author: [Brock Petrie](http://www.brockpetrie.com)
--  Build Date: 2011-09-10
+-  Build Date: 2011-09-14
 -  Requirements: Symphony 2.2
 
 ## Description
@@ -26,6 +26,11 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 -  Make duplicate field creation impossible.
 
 ## Change log
+
+**Version 2.0dev4**
+
+- Added option to choose between 2 fieldtypes for a subfield: Textfield (default) and Select List. If Select List is chosen, an additional field is displayed that allows for entering the preset options for the select list (entered as comma-separated values; e.g. 'Choice 1, Choice 2, Choice 3, Choice 4').
+- Stylistic changes
 
 **Version 2.0dev3**
 

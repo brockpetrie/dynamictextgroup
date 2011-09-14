@@ -9,7 +9,6 @@
 	width:100%;
 	float:left;
 	position:absolute;
-	/*background:rgba(255,100,200,0.5);*/
 	}
 .box {
 	width:100%;
@@ -25,48 +24,99 @@
 		}
 	.options {
 		height:100%;
-		width:15px;
-		background:url(images/dropdown.png) center center no-repeat;
-		right:3px;
+		width:24px;
+		background:url(images/dropdown-open.png) center center no-repeat transparent;
+		right:0px;
 		top:0px;
 		margin:0 auto;
 		cursor:pointer;
 		position:absolute;
 		z-index:999;
 		}
-		.options ul {
+		.options.active {
+			background:url(images/dropdown-close.png) center center no-repeat, -moz-linear-gradient(top, #f0f0f0 0%, #e1e1e1 100%);
+			background:url(images/dropdown-close.png) center center no-repeat, -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f0f0f0), color-stop(100%,#e1e1e1));
+			background:url(images/dropdown-close.png) center center no-repeat, -webkit-linear-gradient(top, #f0f0f0 0%,#e1e1e1 100%);
+			background:url(images/dropdown-close.png) center center no-repeat, linear-gradient(top, #f0f0f0 0%,#e1e1e1 100%);
+			box-shadow:inset 0 0px 5px #e1e1e1;
+			-webkit-box-shadow:inset 0 0px 5px #e1e1e1;
+			-moz-box-shadow:inset 0 0px 5px #e1e1e1;
+			}
+		.optiondrop {
 			position:absolute;
-			display:none;
+			display:block;
 			padding:10px;
+			padding-top:13px;
 			margin:0;
-			width:140px;
-			right:0px;
-			top:23px;
-			background:#333;
+			width:200px;
+			right:0;
+			top:32px;
+			background:#eee;
 			color:#888;
-			border:1px solid #222;
+			border-top:none;
 			cursor:auto;
 			z-index:1000;
 			list-style:none;
+			box-shadow: 0 15px 20px #666, inset 0 6px 6px #e1e1e1;
+			-webkit-box-shadow: 0 15px 20px #666, inset 0 6px 6px #e1e1e1;
+			-moz-box-shadow: 0 15px 20px #666, inset 0 6px 6px #e1e1e1;
+			border-bottom-left-radius:15px;
+			border-bottom-right-radius:15px;
 			}
-		.options:hover { background-image:url(images/dropdown-open.png); }	
-		.options:hover ul { display:block; }	
-		.options li {
+		.optiondrop .shadow {
+			display:block;
+			height:1px;
+			width:100%;
+			left:0; top:0; position:absolute;
+			background:url(images/shadow.png) left no-repeat;
+			}
+			
+		.optiondrop li {
 			font-family:Lucinda Grande, Tahoma, Geneva, sans-serif;
 			list-style:none;
-			padding:0 0 8px 0;
-			margin:0 0 8px 0;
-			border-bottom:1px solid #444;
+			padding:0 0 12px 0;
+			margin:0 0 11px 0;
+			border-bottom:1px solid #ddd;
 			line-height:1em;
 			}
-		.options li:last-child {
+		.optiondrop li:last-child {
 			border:none;
 			margin:0;
 			padding:0;
 			}
 			
-		.options label { margin:0; }
-		.options input[type='checkbox'] { margin-right:5px; }
+		.optiondrop select, .optiondrop input[type='text'] {
+			margin-top:5px;
+			}
+		.optiondrop input[type='text'] {
+			padding:4px 3px;
+			color:#666;
+			font-size:11px;
+			border:1px solid #d8d8d8;
+			border-top-color:#c8c8c8;
+			background: -moz-linear-gradient(top, #f9f9f9 0%, #fff 100%);
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f9f9f9), color-stop(100%,#fff));
+			background: -webkit-linear-gradient(top, #f9f9f9 0%,#fff 100%);
+			background: linear-gradient(top, #f9f9f9 0%,#fff 100%);
+			-webkit-border-radius: 2px;
+			-moz-border-radius: 2px;
+			border-radius: 2px;
+			-moz-box-shadow:inset 0 1px 2px #dadada, 0 1px 0px #f6f6f6;
+			-webkit-box-shadow:inset 0 1px 2px #dadada, 0 1px 0px #f6f6f6;
+			box-shadow:inset 0 1px 2px #dadada, 0 1px 0px #f6f6f6;
+			}
+		.optiondrop input[type='text']:focus {
+			}
+		.optiondrop label {
+			margin:0;
+			color:#888;
+			}
+		.options label i {
+			font-style:italic;
+			font-size:10px;
+			color:#777;
+			}
+		.optiondrop input[type='checkbox'] { margin-right:5px; }
 .placeholder {
 	width:10%;
 	float:left;
@@ -83,6 +133,10 @@
 		box-shadow: 0 0 5px #999;
 		-webkit-box-shadow: 0 0 5px #999;
 		-moz-box-shadow: 0 0 5px #999;
+		-webkit-border-radius: 1px;
+		-moz-border-radius: 1px;
+		border-radius: 1px;
+		
 		}
 	.inner:hover {
 		box-shadow: 0 0 5px #666;
@@ -103,7 +157,7 @@
 		background:none;
 		border:none;
 		padding:4px 3px;
-		width:40%;
+		width:50%;
 		margin:0;
 		position:absolute;
 		left:12px;
@@ -143,8 +197,6 @@
 	background-color:#000;
 	color:#FFF;
 	cursor:pointer;
-	/*padding:4px 10px 5px;
-	line-height:0.99;*/
 	padding:.4em 1em .5em 1em;
 	line-height:2em;
 	font:10px/11px Lucida Grande, Leelawadee, Tahoma, Verdana, sans-serif;
@@ -174,9 +226,10 @@
 			}
 	.dtgButton.del {
 		font-size:.8em;
+		background:#d43;
 		}
 		.dtgButton.del:hover {
-			background:#d43;
+			background:#cf3120;
 			color:#fff;
 			}
 	

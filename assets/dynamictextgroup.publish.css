@@ -9,7 +9,7 @@
 	background-color: #D42;
 	border: 1px solid #C31;
 	border-top-width: 0;
-	border-bottom-color: #B21;
+	border-bottom-color: #B21;margin-top: 1.5em;
 	}
 	.field-dynamictextgroup div.invalid label { border:none; margin-top:1px; margin-bottom:1.5em; }
 	.field-dynamictextgroup div.invalid label i { top:0; right:0; }
@@ -41,8 +41,11 @@
 	background:none !important;
 	padding: 0 3px 0 0;
 	width: 50%;
+	position:relative;
 	float: left;
 	}
+	.field-dynamictextgroup div.stage span.fieldHolder span {
+		}
 
 .field-dynamictextgroup div.stage div.clear {
 	clear:both;
@@ -66,16 +69,62 @@
 	-webkit-box-shadow: inset 1px 1px 1px #f0f0f0;
 	-moz-box-shadow: inset 1px 1px 1px #f0f0f0;
 	box-shadow: inset 1px 1px 1px #f0f0f0;
-	-webkit-border-radius: 1px;
-	-moz-border-radius: 1px;
-	border-radius: 1px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
 	float: left;
 	}
 	.field-dynamictextgroup .invalid .req input[value=""] {
 		border: 1px solid #d42 !important;
 		}
-	
+	.field-dynamictextgroup .invalid .req.empty .customStyleSelectBox {
+		border: 1px solid #d42 !important;
+		}
+	.field-dynamictextgroup .invalid .new .req input[value=""] {
+		border: 1px solid #C2C2C2 !important;
+		}
+	.field-dynamictextgroup .invalid .new .req.empty .customStyleSelectBox {
+		border: 1px solid #C2C2C2 !important;
+		border-bottom-color:#bbb !important;
+		}
 
+.field-dynamictextgroup div.stage span.fields select {
+	position:relative;
+	top:3px;
+	font-size: 109.09%;
+	}
+	span.customStyleSelectBox {
+		font-size: 109.09%;
+		border: 1px solid #C2C2C2;
+		border-bottom-color:#bbb;
+		padding: 5px 5px 6px 5px !important;
+		line-height:1em;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+		-webkit-border-radius: 2px;
+		-moz-border-radius: 2px;
+		border-radius: 2px;
+		float: left;
+		background: #ffffff;
+		background: -moz-linear-gradient(top, #ffffff 0%, #eee 100%);
+		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#eee));
+		background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);
+		background: -o-linear-gradient(top, #ffffff 0%,#eee 100%);
+		background: -ms-linear-gradient(top, #ffffff 0%,#eee 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eeeeee',GradientType=0 );
+		background: linear-gradient(top, #ffffff 0%,#eee 100%);
+		}
+	.customStyleSelectBox:hover {
+		}
+	span.customStyleSelectBox span, span.customStyleSelectBox span:hover {
+		background:url(images/select-arrows.png) no-repeat center right !important;
+		padding:0 !important;
+		}
+	span.customStyleSelectBoxInner {
+		background:url(images/select-arrows.png) no-repeat center right !important;
+		}
+	
 .field-dynamictextgroup div.stage span.fields input:focus {
 	outline: none;
 	}
@@ -87,8 +136,8 @@
 	right:10px;
 	margin-top: 0;
 	}
-	span.req { color:#d43 !important; }
-	.invalid span.req { color:#fff !important; }
+	label > i > span.req { color:#d43; }
+	.invalid label > i > span.req { color:#fff; }
 .field-dynamictextgroup div.stage span.fields em.end.label {
 	top: 28px;
 	}

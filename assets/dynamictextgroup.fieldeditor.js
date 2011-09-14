@@ -1,10 +1,7 @@
 (function($) {
+
+	var schematic = [];
 	
-	var schematic = {
-		labels		: new Array(),
-		widths		: new Array(),
-		required	: new Array(),
-	};
 	var additions = {
 		labels		: new Array()
 	};
@@ -19,7 +16,7 @@
 
 	var dtgEditor = {
 		
-		minw		: 60,
+		minw		: 80,
 		area		: 780,
 		boxOrder	: new Array(),
 
@@ -43,10 +40,10 @@
 		
 		
 		parseSchema: function(schema) {
-			if (schema.labels) {
-				var ct = schema.labels.length;
+			if (schema[0].label) {
+				var ct = schema.length;
 				for (var i=0; i<ct; i++) {
-					dtgEditor.fieldMaster(null, schema.labels[i], schema.handles[i], schema.widths[i], schema.required[i]);
+					dtgEditor.fieldMaster(null, schema[i].label, schema[i].handle, schema[i].width, schema[i].options);
 				}
 			}
 		},
@@ -58,17 +55,20 @@
 			var _a = $('#addfields');
 			var _d = $('#delfields');
 			
-			schematic.labels = [];
-			schematic.widths = [];
-			schematic.required = [];
+			schematic = [];
 			additions.labels = [];
 			renames.labels = [];
 			renames.handles = [];
 			
 			$(".box", "#stage").each(function() {
-				schematic.labels.push($('.tfield', $(this)).val());
-				schematic.widths.push(Math.round(dtgEditor.parseWidth($(this).innerWidth())*10)/10);
-				schematic.required.push($('input[name="required"]', $(this)).attr('checked'));
+				var field = {};
+				field.label = $('.tfield', $(this)).val();
+				field.width = Math.round(dtgEditor.parseWidth($(this).innerWidth())*10)/10;
+				field.options = {};
+				field.options.required = $('input[name="required"]', $(this)).attr('checked');
+				field.options.type = $('#fieldType', $(this)).val();
+				if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
+				schematic.push(field);
 				
 				if ($(this).hasClass('new')) {
 					additions.labels.push($('.tfield', $(this)).val());
@@ -82,16 +82,17 @@
 				}
 			});
 			
-			if (schematic.labels[0]) { _f.val(JSON.stringify(schematic)); } else { _f.val(''); }
+			if (schematic[0]) { _f.val(JSON.stringify(schematic)); } else { _f.val(''); }
 			if (renames.labels[0]) { _r.val(JSON.stringify(renames)); } else { _r.val(''); }
 			if (additions.labels[0]) { _a.val(JSON.stringify(additions)); } else { _a.val(''); }
 			if (deletions.handles[0]) { _d.val(JSON.stringify(deletions)); } else { _d.val(''); }
 		},
 		
 		
-		fieldMaster: function(del, fLabel, fHandle, fWidth, fReq) {
+		fieldMaster: function(del, fLabel, fHandle, fWidth, fOpts) {
 			var oldOrder = dtgEditor.boxOrder.length;
 			var emptyspace = false;
+			var isNew = fLabel ? false : true;
 			
 			if (del) {
 				// Remove field
@@ -104,40 +105,86 @@
 				
 			} else {
 				// Add field
-				var __new = fLabel ? '' : ' new';
-				var boxy = $('<div></div>').attr('id', 'box'+(dtgEditor.boxOrder.length+1)).addClass('box'+__new).html('<div class="inner"><div class="handle"></div></div>');
-				var __boxlabel = fLabel ? fLabel : 'Field '+(dtgEditor.boxOrder.length+1);
-				var __boxhandle = fHandle ? fHandle : 'f'+(dtgEditor.boxOrder.length+1);
+				var newclass = fLabel ? '' : ' new';
+				var fLabel = fLabel ? fLabel : 'Field '+(dtgEditor.boxOrder.length+1);
+				var fHandle = fHandle ? fHandle : 'f'+(dtgEditor.boxOrder.length+1);
+				if (!fOpts) {
+					fOpts = {};
+					fOpts.required = false;
+					fOpts.type = 'text';
+					fOpts.selectItems = '';
+				}
 				
-				var textfield = $('<input />').val(__boxlabel).attr('type', 'text').attr('class', 'tfield').attr('id', __boxhandle).attr('name', __boxhandle);
+				var boxy = $('<div></div>').attr('id', 'box'+(dtgEditor.boxOrder.length+1)).addClass('box'+newclass).html('<div class="inner"><div class="handle"></div></div>');
+				
+				// Field Label input
+				var textfield = $('<input type="text" class="tfield" />').attr('id', fHandle).attr('name', fHandle).val(fLabel);
 				$(textfield).appendTo($('.inner', boxy));
 				$(textfield).change(function() {
 					dtgEditor.nameCheck();
 				});
 				
+				// Field Options holder
 				var optionsHolder = $('<div class="options"></div>');
-				$(optionsHolder).html('<input type="hidden" style="display:none;" id="original" value="'+__boxlabel+'" />');
+				var originalName = $('<input type="hidden" style="display:none;" id="original" />').val(fLabel).appendTo($(optionsHolder));
+				var options = $('<ul class="optiondrop"><span class="shadow"></span></ul>');
+				$(options).hide();
+				$(optionsHolder).click(function() {
+					$(options).slideToggle(150);
+					$(this).toggleClass('active');
+				});
 				
-				var options = $('<ul></ul>').appendTo($(optionsHolder));
+				// Field Type select
+				var fieldType = $('<select id="fieldType" name="fieldType"></select>').append('<option value="text">Textfield</option>').append('<option value="select">Select List</option>');
+				$(fieldType).val(fOpts.type);
+				var fieldTypeLabel = $('<label for="fieldType">Field Type<br /></label>').append(fieldType);
 				
-				var requiredBox = $('<input />').attr('type', 'checkbox').attr('name', 'required');
-				if (fReq) $(requiredBox).attr('checked','checked');
+				var selectItems = $('<input type="text" name="selectItems" id="selectItems" value="" />');
+				var selectItemsLabel = $('<label for="selectItems">List Values (comma-separated)<br /></label>').append(selectItems);
+				
+				$('<li></li>').append(fieldTypeLabel).appendTo($(options));
+				var selectItemsHolder = $('<li></li>').append(selectItemsLabel).appendTo($(options));
+				
+				if (fOpts.type != 'select') {
+					$(selectItemsHolder).hide();
+				} else {
+					$(selectItems).val(fOpts.selectItems);
+				}
+				
+				$(fieldType).change(function() {
+					if ($(this).val() == 'select') {
+						$(selectItemsHolder).fadeIn(250);
+					} else {
+						$(selectItemsHolder).fadeOut(250);
+					}
+					dtgEditor.buildSchema();
+				});
+				$(selectItems).change(function() {
+					dtgEditor.buildSchema();
+				});
+				
+				
+				// Field Required checkbox
+				var requiredBox = $('<input type="checkbox" name="required" />');
+				if (fOpts.required) $(requiredBox).attr('checked','checked');
 				$(requiredBox).change(function() { dtgEditor.buildSchema(); });
 				var requiredBoxLabel = $('<label></label>').append(requiredBox).append('Required');
 				$('<li></li>').append(requiredBoxLabel).appendTo($(options));
 				
+				// Field Delete button
 				var deleteButton = $('<a class="dtgButton del" href="#">Delete Field</a>').bind('click',function() { dtgEditor.fieldMaster(boxy); return false; });
 				$('<li></li>').append(deleteButton).appendTo($(options));
 				
 				$(optionsHolder).appendTo($('.inner', boxy));
+				$(options).appendTo($('.inner', boxy));
 				
 				$(boxy).appendTo($('#stage'));
 				$(boxy).resize(function() {
 					//$(textfield).width($(boxy).width()-45);
 				});
 				
-				var __boxwidth = fWidth ? fWidth : 100/(dtgEditor.boxOrder.length+1);
-				$(boxy).width(__boxwidth+'%');
+				var fWidth = fWidth ? fWidth : 100/(dtgEditor.boxOrder.length+1);
+				$(boxy).width(fWidth+'%');
 				
 				$(boxy).resizable({
 					handles		: 'e',
@@ -156,7 +203,7 @@
 			dtgEditor.refreshStage();
 		
 			// Adjust widths
-			if (!fWidth) {
+			if (isNew) {
 				var offsetw = 0;
 				for (var i=0; i<oldOrder; i++) {
 					var targ = $(".box", "#stage")[i];
@@ -253,6 +300,22 @@
 			dtgEditor.boxOrder = $('#stage').sortable('toArray');
 		},
 	}
+	
+	/*$('.dropdown').hide();
+
+	$(document).bind('click', function(e) {
+		var target = $( e.target );
+		if ( target.closest('#nav').length < 1 ) {
+			nav.find('ul.dropdown').hide();
+			return;
+		}
+		if ( target.parent().is('span') ) {
+			var li = target.closest('li.menu');
+			li.siblings().find('ul.dropdown').hide();
+			li.find('ul.dropdown').toggle();
+			e.preventDefault();
+		}
+	})*/
 	
 	
 	$(document).ready(function () {

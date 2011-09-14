@@ -116,11 +116,13 @@
 			// Parse schema
 			if ($this->get('schema') != '') {
 				$schema = json_decode($this->get('schema'));
-				$ct = count($schema->labels);
-				foreach ($schema->labels as $label) $schema->handles[] = Lang::createHandle($label);
+				$ct = count($schema);
 				$totalW = 100;
-				foreach ($schema->widths as $w) $totalW -= $w;
-				$schema->widths[$ct-1] += $totalW;
+				foreach ($schema as $i=>&$field) {
+					$field->handle = Lang::createHandle($field->label);
+					$totalW -= $field->width;
+				}
+				$schema[$ct-1]->width += $totalW;
 				
 				$fields['fieldcount'] = $ct;
 				$fields['schema'] = json_encode($schema);
@@ -189,6 +191,8 @@
 			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/lib/stage/stage.publish.css', 'screen', 102, false);
 			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
+			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/chosen/chosen.jquery.js', 105, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/chosen/chosen.css', 'screen', 106, false);
 			
 			// Get settings
 			$settings = array();
@@ -200,29 +204,32 @@
 			}
 			
 			$schema = json_decode($this->get('schema'));
-			$sampling = $schema->handles[0];
-			$entryCount = count($data[$sampling]);
 			$fieldCount = $this->get('fieldcount');
+			
 			
 			// Populate existing entries
 			$content = array();
 			if(is_array($data)) {
-				foreach ($data as &$row) { if (!is_array($row)) $row = array($row); }
+				$entryCount = 1;
+				foreach ($data as &$row) {
+					if (!is_array($row)) $row = array($row);
+					if (count($row) > $entryCount) $entryCount = count($row);
+				}
 				
 				for($i=0; $i<$entryCount; $i++) {
-					foreach ($schema->handles as $handle) {
-						$entryValues[$i][] = $data[$handle][$i];
+					foreach ($schema as $field) {
+						$entryValues[$i][] = $data[$field->handle][$i];
 					}
-					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $schema->labels, $schema->handles, $schema->widths, $schema->required);
+					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $schema);
 				}
 			}
 			// Blank entry
 			else {
-				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema->labels,  $schema->handles, $schema->widths, $schema->required);
+				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema);
 			}
 			
 			// Add template
-			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema->labels,  $schema->handles, $schema->widths, $schema->required);
+			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema);
 		
 			// Create stage
 			$stage = Stage::create('dynamictextgroup', $this->get('id'), implode($settings, ' '), $content);
@@ -245,7 +252,8 @@
 			$message = __("'%s' is a required field.", array($this->get('label')));
 			
 			$schema = json_decode($this->get('schema'));
-			$sampling = $schema->handles[0];
+			
+			$sampling = $schema[0]->handle;
 			$entryCount = count($data[$sampling]);
 			
 			$empty = true;
@@ -253,11 +261,11 @@
 			for($i=0; $i<$entryCount; $i++) {
 				$emptyRow = true;
 				$emptyReq = false;
-				foreach ($schema->handles as $h=>$handle) {
-					$req = $schema->required[$h] ? true : false;
-					if ($req && $data[$handle][$i] == '') {
+				foreach ($schema as $f=>$field) {
+					$req = $schema[$f]->options->required ? true : false;
+					if ($req && $data[$field->handle][$i] == '') {
 						$emptyReq = true;
-					} else if ($data[$handle][$i] != '') {
+					} else if ($data[$field->handle][$i] != '') {
 						$emptyRow = false;
 					}
 				}
@@ -282,10 +290,8 @@
 			$count = $this->get('fieldcount');
 			
 			// Check for the field with the most values
-			$entryCount = 1;
-			foreach ($data as $field) {
-				if (count($field) > $entryCount) $entryCount = count($field);
-			}
+			$entryCount = 0;
+			foreach ($data as $row) if (count($row) > $entryCount) $entryCount = count($row);
 			
 			// Check for empties
 			$empty = true;
@@ -400,7 +406,7 @@
 			// Get field properties and decode schema
 			$fieldCount = $this->get('fieldcount');
 			$schema = json_decode($this->get('schema'));
-			$sampling = $schema->handles[0];
+			$sampling = $schema[0]->handle;
 			$entryCount = count($data[$sampling]);
 				
 			// Parse data
@@ -409,9 +415,9 @@
 			for($i=0; $i<$entryCount; $i++) {
 				$item = new XMLElement('item');
 				$empty = true;
-				foreach ($schema->handles as $handle) {
-					$val = $data[$handle][$i] != ' ' ? General::sanitize($data[$handle][$i]) : '';
-					$item->appendChild(new XMLElement($handle, $val));
+				foreach ($schema as $field) {
+					$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
+					$item->appendChild(new XMLElement($field->handle, $val));
 				}
 				$textgroup->appendChild($item);
 			}
