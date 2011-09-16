@@ -3,11 +3,21 @@
 	/* * 	
 	 * *	The Dynamic Text Group field provides a method to dynamically add a text field or text field groups to a section entry.
 	 * *	@author: Brock Petrie, brockpetrie@gmail.com
-	 * *	@source: http://github.com/brockpetrie/datetime
+	 * *	@source: http://github.com/brockpetrie/dynamictextgroup
 	 * */
 	 
 	$(document).ready(function() {
 		$('.styled').customStyle();
+		$('input#badItems').each(function() {
+			//alert($(this).val());
+			var badItems = JSON.parse($(this).val());
+			$.each(badItems, function(i, obj) {
+				var targ = '#'+obj.handle;
+				var targHolder = $('li:eq('+obj.index+')', 'div.stage');
+				$(targ, targHolder).addClass('badvalidation');
+			});
+		});
+		
 		// Initialize Stage
 		$('div.field-dynamictextgroup').each(function() {
 			var manager = $(this),

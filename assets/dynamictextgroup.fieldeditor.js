@@ -68,6 +68,7 @@
 				field.options.required = $('input[name="required"]', $(this)).attr('checked');
 				field.options.type = $('#fieldType', $(this)).val();
 				if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
+				if (field.options.type == 'text') field.options.validationRule = $('#validationRule', $(this)).val();
 				schematic.push(field);
 				
 				if ($(this).hasClass('new')) {
@@ -139,27 +140,39 @@
 				$(fieldType).val(fOpts.type);
 				var fieldTypeLabel = $('<label for="fieldType">Field Type<br /></label>').append(fieldType);
 				
-				var selectItems = $('<input type="text" name="selectItems" id="selectItems" value="" />');
+				// Select options
+				var selectItems = $('<input type="text" name="selectItems" id="selectItems" value="" placeholder="e.g. Option 1, Option 2, Option 3" />');
 				var selectItemsLabel = $('<label for="selectItems">List Values (comma-separated)<br /></label>').append(selectItems);
 				
-				$('<li></li>').append(fieldTypeLabel).appendTo($(options));
-				var selectItemsHolder = $('<li></li>').append(selectItemsLabel).appendTo($(options));
+				// Validation rule
+				var validationRule = $('<input type="text" name="validationRule" id="validationRule" value="" placeholder="Enter a regex pattern" />');
+				var validationRuleLabel = $('<label for="validationRule">Validation Rule<br /></label>').append(validationRule).append('<br />');
+				$('<a href="#" class="valOption">number</a>').click(function(){ $(validationRule).val('/^-?(?:\d+(?:\.\d+)?|\.\d+)$/i'); dtgEditor.buildSchema(); return false; }).appendTo(validationRuleLabel);
+				$('<a href="#" class="valOption">email</a>').click(function(){ $(validationRule).val('/^\w(?:\.?[\w%+-]+)*@\w(?:[\w-]*\.)+?[a-z]{2,}$/i'); dtgEditor.buildSchema(); return false; }).appendTo(validationRuleLabel);
+				$('<a href="#" class="valOption">URI</a>').click(function(){ $(validationRule).val('/^[^\s:\/?#]+:(?:\/{2,3})?[^\s.\/?#]+(?:\.[^\s.\/?#]+)*(?:\/[^\s?#]*\??[^\s?#]*(#[^\s#]*)?)?$/'); dtgEditor.buildSchema(); return false; }).appendTo(validationRuleLabel);
 				
-				if (fOpts.type != 'select') {
-					$(selectItemsHolder).hide();
-				} else {
-					$(selectItems).val(fOpts.selectItems);
-				}
+				// Append field type options
+				var fieldTypeHolder = $('<li></li>').append(fieldTypeLabel).appendTo($(options));
+				var selectItemsHolder = $('<li></li>').append(selectItemsLabel).appendTo($(options));
+				var validationRuleHolder = $('<li></li>').append(validationRuleLabel).appendTo($(options));
+				
+				if (fOpts.type != 'select') $(selectItemsHolder).hide();
+					else $(selectItems).val(fOpts.selectItems);
+					
+				if (fOpts.type != 'text') $(validationRuleHolder).hide();
+					else $(validationRule).val(fOpts.validationRule);
+				
+				$(selectItems).change(function() { dtgEditor.buildSchema(); });
+				$(validationRule).change(function() { dtgEditor.buildSchema(); });
 				
 				$(fieldType).change(function() {
 					if ($(this).val() == 'select') {
-						$(selectItemsHolder).fadeIn(250);
-					} else {
-						$(selectItemsHolder).fadeOut(250);
+						$(selectItemsHolder).slideDown(250);
+						$(validationRuleHolder).slideUp(250);
+					} else if ($(this).val() == 'text') {
+						$(selectItemsHolder).slideUp(250);
+						$(validationRuleHolder).slideDown(250);
 					}
-					dtgEditor.buildSchema();
-				});
-				$(selectItems).change(function() {
 					dtgEditor.buildSchema();
 				});
 				

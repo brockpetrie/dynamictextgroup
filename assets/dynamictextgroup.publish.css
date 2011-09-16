@@ -1,7 +1,7 @@
 /* * 	
  * *	Dynamic Text Group styling
  * *	@author: Brock Petrie, brockpetrie@gmail.com
- * *	@source: http://github.com/brockpetrie/datetime
+ * *	@source: http://github.com/brockpetrie/dynamictextgroup
  * */
 
 .field-dynamictextgroup div.invalid {
@@ -74,10 +74,9 @@
 	border-radius: 2px;
 	float: left;
 	}
-	.field-dynamictextgroup .invalid .req input[value=""] {
-		border: 1px solid #d42 !important;
-		}
-	.field-dynamictextgroup .invalid .req.empty .customStyleSelectBox {
+	.field-dynamictextgroup .invalid .req input[value=""],
+	.field-dynamictextgroup .invalid .req.empty .customStyleSelectBox,
+	.field-dynamictextgroup .invalid .badvalidation {
 		border: 1px solid #d42 !important;
 		}
 	.field-dynamictextgroup .invalid .new .req input[value=""] {

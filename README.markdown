@@ -1,8 +1,8 @@
 # Dynamic Text Group
 
--  Version: 2.0dev4
+-  Version: 2.0dev5
 -  Author: [Brock Petrie](http://www.brockpetrie.com)
--  Build Date: 2011-09-14
+-  Build Date: 2011-09-16
 -  Requirements: Symphony 2.2
 
 ## Description
@@ -26,6 +26,12 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 -  Make duplicate field creation impossible.
 
 ## Change log
+
+**Version 2.0dev5**
+
+- Added option to declare validation rules for textfields; added 'number', 'email' and 'URI' pattern presets.
+- Added placeholder attribute to textfields.
+- Minor bugfixes
 
 **Version 2.0dev4**
 

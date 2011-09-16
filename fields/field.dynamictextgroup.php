@@ -191,8 +191,6 @@
 			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/lib/stage/stage.publish.css', 'screen', 102, false);
 			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/chosen/chosen.jquery.js', 105, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/chosen/chosen.css', 'screen', 106, false);
 			
 			// Get settings
 			$settings = array();
@@ -257,22 +255,36 @@
 			$entryCount = count($data[$sampling]);
 			
 			$empty = true;
+			$badValidate = false;
+			$badValidateItems = array();
 			
 			for($i=0; $i<$entryCount; $i++) {
 				$emptyRow = true;
 				$emptyReq = false;
 				foreach ($schema as $f=>$field) {
+					// Get/set required option
 					$req = $schema[$f]->options->required ? true : false;
-					if ($req && $data[$field->handle][$i] == '') {
-						$emptyReq = true;
-					} else if ($data[$field->handle][$i] != '') {
-						$emptyRow = false;
+					// Get/set validation option
+					if ($schema[$f]->options->type == 'text') $rule = $schema[$f]->options->validationRule != '' ? $schema[$f]->options->validationRule : false;
+					else $rule = false;
+					// Check if matches validation rule
+					if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
+						$badValidateItems[] = array('handle' => 'field-'.$field->handle, 'index' => $i);
+						$badValidate = true;
 					}
+					// Check if required subfield is empty
+					if ($req && $data[$field->handle][$i] == '')	$emptyReq = true;
+					else if ($data[$field->handle][$i] != '')		$emptyRow = false;
 				}
 				if (!$emptyRow && $emptyReq) {
 					$message = __("'%s' contains required fields that are empty.", array($this->get('label')));
 					return self::__MISSING_FIELDS__;
 				}
+			}
+			if ($badValidate){
+				$badValidateItems = json_encode($badValidateItems);
+				$message = __("'%s' contains invalid data. Please check the contents.<input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badValidateItems));
+				return self::__INVALID_FIELDS__;
 			}
 			
 			if ($empty && $this->get('required') == 'yes') return self::__MISSING_FIELDS__;

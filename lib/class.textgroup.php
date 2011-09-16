@@ -35,8 +35,8 @@
 			$width = 'style="width:'. $width .'% !important;"';
 			$reqLabelAppendage = $required ? ' <span class="req">*</span>' : '';
 			$class .= $required ? ' req' : '';
-			$label = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
-			return '<span class="fieldHolder '. $handle .'-holder'.$class.'" '. $width .'>'. $label .'<input type="text" name="fields['. $element .']['. $handle .'][]" value="'. $textvalue .'" class="field-'. $handle .'" /></span>';
+			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
+			return '<span class="fieldHolder '. $handle .'-holder'.$class.'" '. $width .'>'. $lbl .'<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" value="'. $textvalue .'" placeholder="'. $label .'" class="field-'. $handle .'" /></span>';
 		}
 		
 		private static function __createSelectField($element, $handle, $val, $label=NULL, $width=NULL, $options=NULL) {
@@ -46,7 +46,7 @@
 			$fSelectItems = explode(',', $options->selectItems);
 			$width = 'style="width:'. $width .'% !important;"';
 			$select = '<span class="fieldHolder '. $handle .'-holder'. $class .'" '. $width .'>';
-			$select .= '<select name="fields['. $element .']['. $handle .'][]" class="styled field-'. $handle .'">';
+			$select .= '<select id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" class="styled field-'. $handle .'">';
 			$select .= '<option value="">'. $label .'</option>';
 			foreach ($fSelectItems as &$item) {
 				$item = trim($item);
