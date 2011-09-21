@@ -218,7 +218,7 @@
 					foreach ($schema as $field) {
 						$entryValues[$i][] = $data[$field->handle][$i];
 					}
-					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $schema);
+					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], NULL, $schema);
 				}
 			}
 			// Blank entry
@@ -255,36 +255,92 @@
 			$entryCount = count($data[$sampling]);
 			
 			$empty = true;
+			
 			$badValidate = false;
-			$badValidateItems = array();
+			$badRadio = false;
+			$badCheck = false;
+			
+			$checkItems = array();
+			$radioItems = array();
 			
 			for($i=0; $i<$entryCount; $i++) {
 				$emptyRow = true;
 				$emptyReq = false;
 				foreach ($schema as $f=>$field) {
 					// Get/set required option
-					$req = $schema[$f]->options->required ? true : false;
-					// Get/set validation option
-					if ($schema[$f]->options->type == 'text') $rule = $schema[$f]->options->validationRule != '' ? $schema[$f]->options->validationRule : false;
-					else $rule = false;
-					// Check if matches validation rule
-					if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
-						$badValidateItems[] = array('handle' => 'field-'.$field->handle, 'index' => $i);
-						$badValidate = true;
+					$req = $field->options->required ? true : false;
+					
+					switch ($field->options->type) {
+						case 'text':
+							// Check if field passes any rules
+							$rule = $field->options->validationRule != '' ? $field->options->validationRule : false;
+							if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
+								$badValidate[] = array('handle' => $field->handle.'-holder', 'index' => $i);
+							}
+							// Check if required subfield is empty
+							if ($req && $data[$field->handle][$i] == '') {
+								$emptyReq = true;
+							} else if ($data[$field->handle][$i] != '') {
+								$empty = false;
+								$emptyRow = false;
+							}
+							break;
+							
+						case 'select':
+							if ($req && $data[$field->handle][$i] == '') {
+								$emptyReq = true;
+							} else if ($data[$field->handle][$i] != '') {
+								$empty = false;
+								$emptyRow = false;
+							}
+							break;
+							
+						case 'checkbox':
+							if ($i == 0) $checkItems[$f] = false;
+							if ($data[$field->handle][$i] == 'yes') {
+								$checkItems[$f] = true;
+								$emptyRow = false;
+								$empty = false;
+							}
+							if ($i == $entryCount-1  &&  $entryCount > 0  &&  !$checkItems[$f]  &&  $req  &&  !$empty) {
+								$badCheck[] = array('handle' => $field->handle.'-holder');
+							}
+							break;
+							
+						case 'radio':
+							if ($i == 0) $radioItems[$f] = false;
+							if ($data[$field->handle][$i] == 'yes') {
+								$radioItems[$f] = true;
+								$emptyRow = false;
+								$empty = false;
+							}
+							if ($i == $entryCount-1  &&  $entryCount > 0  &&  !$radioItems[$f]  &&  $req  &&  !$empty) {
+								$badRadio[] = array('handle' => $field->handle.'-holder');
+							}
+							break;
 					}
-					// Check if required subfield is empty
-					if ($req && $data[$field->handle][$i] == '')	$emptyReq = true;
-					else if ($data[$field->handle][$i] != '')		$emptyRow = false;
 				}
+				
 				if (!$emptyRow && $emptyReq) {
 					$message = __("'%s' contains required fields that are empty.", array($this->get('label')));
 					return self::__MISSING_FIELDS__;
 				}
 			}
+			
 			if ($badValidate){
-				$badValidateItems = json_encode($badValidateItems);
-				$message = __("'%s' contains invalid data. Please check the contents.<input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badValidateItems));
+				$badValidate = json_encode($badValidate);
+				$message = __("'%s' contains invalid data. Please check the contents.<input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badValidate));
 				return self::__INVALID_FIELDS__;
+			}
+			if ($badRadio) {
+				$badRadio = json_encode($badRadio);
+				$message = __("'%s' contains required fields that are empty. <input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badRadio));
+				return self::__MISSING_FIELDS__;
+			}
+			if ($badCheck) {
+				$badCheck = json_encode($badCheck);
+				$message = __("'%s' contains required fields that are empty. <input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badCheck));
+				return self::__MISSING_FIELDS__;
 			}
 			
 			if ($empty && $this->get('required') == 'yes') return self::__MISSING_FIELDS__;
@@ -449,8 +505,9 @@
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#getExampleFormMarkup * * */
 		public function getExampleFormMarkup() {
 			$label = Widget::Label($this->get('label'));
-			$label->appendChild(Widget::Input('fields['.$this->get('element_name').'][samplefield][]'));
-			
+			$schema = json_decode($this->get('schema'));
+			$note = new XMLElement('strong', 'IMPORTANT: the event sample code is not updated when you make changes to DynamicTextGroup subfields in the section editor. Remember that your front-end fields must always match the back-end fields!');
+			foreach ($schema as $field) $label->appendChild(Widget::Input('fields['.$this->get('element_name').']['.$field->handle.'][]'));
 			return $label;
 		}
 	}

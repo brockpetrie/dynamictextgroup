@@ -6,17 +6,57 @@
 	 * *	@source: http://github.com/brockpetrie/dynamictextgroup
 	 * */
 	 
+	 
+	// DynamicTextGroup stuff
+	
+	DynamicTextGroup = {
+		checkHelper: function(type) {
+			$('.fieldtype-'+type).each(function() {
+				var checker = $('input[type="'+type+'"]', $(this));
+				var checkData = $('input[type="hidden"]', $(this));
+				if ($(checker).attr('checked')) {
+					$(checkData).val('yes');
+				} else {
+					$(checkData).val('');
+				}
+			});
+		},
+		
+		parseBadItems: function() {
+			$('input#badItems').each(function() {
+				var badItems = JSON.parse($(this).val());
+				$.each(badItems, function(i, obj) {
+					var targ = '.'+obj.handle;
+					var targHolder = typeof(obj.index) == 'number' ? $('li:eq('+obj.index+')', 'div.stage') : 'div.stage';
+					$(targ, targHolder).addClass('baditem');
+				});
+			});
+		},
+		
+		constructed: function() {
+			$('.styled').customStyle();
+			$('.fieldtype-radio').each(function() {
+				var checker = $('input[type="radio"]', $(this));
+				$(checker).change(function() {
+					DynamicTextGroup.checkHelper('radio');
+				});
+			});
+			$('.fieldtype-checkbox').each(function() {
+				var checker = $('input[type="checkbox"]', $(this));
+				$(checker).change(function() {
+					DynamicTextGroup.checkHelper('checkbox');
+				});
+			});
+		}
+	}
+	
+		
+	// Stage stuff
+	
 	$(document).ready(function() {
 		$('.styled').customStyle();
-		$('input#badItems').each(function() {
-			//alert($(this).val());
-			var badItems = JSON.parse($(this).val());
-			$.each(badItems, function(i, obj) {
-				var targ = '#'+obj.handle;
-				var targHolder = $('li:eq('+obj.index+')', 'div.stage');
-				$(targ, targHolder).addClass('badvalidation');
-			});
-		});
+		DynamicTextGroup.parseBadItems();
+		DynamicTextGroup.constructed();
 		
 		// Initialize Stage
 		$('div.field-dynamictextgroup').each(function() {
@@ -26,7 +66,7 @@
 				selection = stage.find('ul.selection');
 			
 			stage.bind('constructanim', function() {
-				$('.styled').customStyle();
+				DynamicTextGroup.constructed();
 			});
 			
 			// Hide label help
@@ -37,29 +77,31 @@
 							
 			/*-----------------------------------------------------------------------*/
 
-			// Removing the focus
-			selection.delegate('input', 'blur.textgroup', function(event) {
-				var input = $(this),
-					fields = input.parent().parent(),
-					end;
-
-				fields.removeClass('focus');
-				help.hide();
+			// Text input focus
+			selection.delegate('input', 'focus.textgroup', function(event) {
+				var dofocus = 	$(this).parent().parent().addClass('focus');
+				var label = 	$(this).parent().find('label').html();
+				//help.html(label);
+				//help.fadeIn('fast');
 			});
-		
-			// Adding the focus
-			selection.delegate('input', 'focus.textgroup', function() {
-				var input = $(this),
-					fields = input.parent().parent().addClass('focus'),
-					label = input.parent().find('label').html();
-					
-				help.html(label);
-				help.fadeIn('fast');
+			selection.delegate('input', 'blur.textgroup', function(event) {
+				$(this).parent().parent().removeClass('focus');
+				//help.hide();
 			});
 			
+			// Select focus
+			selection.delegate('select', 'focus.textgroup', function(event) {
+				var dofocus = 	$(this).parent().parent().addClass('focus');
+				var label = 	$(this).parent().find('label').html();
+			});
+			selection.delegate('select', 'blur.textgroup', function(event) {
+				$(this).parent().parent().removeClass('focus');
+			});
+			
+			
 		});
-
 	});
+	
 	
 	// Script to stylize the select lists
 	$.fn.extend({

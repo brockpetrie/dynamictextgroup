@@ -1,8 +1,8 @@
 # Dynamic Text Group
 
--  Version: 2.0dev5
+-  Version: 2.0dev6
 -  Author: [Brock Petrie](http://www.brockpetrie.com)
--  Build Date: 2011-09-16
+-  Build Date: 2011-09-21
 -  Requirements: Symphony 2.2
 
 ## Description
@@ -26,6 +26,12 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 -  Make duplicate field creation impossible.
 
 ## Change log
+
+**Version 2.0dev6**
+
+- Added 2 new fieldtypes: Checkbox and Radio. Checkbox allows for any amount of checked boxes in the subfield's column; Radio allows for only a single checked radio button in the subfield's column.
+- Fixed validation pattern presets (backslashes weren't being escaped).
+- Minor bugfixes and code improvements.
 
 **Version 2.0dev5**
 
