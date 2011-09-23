@@ -29,6 +29,7 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 
 **Version 2.0dev6**
 
+- `2.0dev6b`: allow for bigger schemas in the `schema` column. allow for bigger schemas in the `schema` column of the extension's DB table (from varchar(255) to varchar(5000)). manually upped the column length awhile ago in my dev environment and forgot to update the extension.driver.php file.
 - Added 2 new fieldtypes: Checkbox and Radio. Checkbox allows for any amount of checked boxes in the subfield's column; Radio allows for only a single checked radio button in the subfield's column.
 - Fixed validation pattern presets (backslashes weren't being escaped).
 - Minor bugfixes and code improvements.
