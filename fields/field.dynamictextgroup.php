@@ -479,7 +479,9 @@
 				
 			// Parse data
 			$textgroup = new XMLElement($this->get('element_name'));
-			foreach ($data as &$row) { if (!is_array($row)) $row = array($row); }
+			if(is_array($data)) {
+				foreach ($data as &$row) { if (!is_array($row)) $row = array($row); }
+			}
 			for($i=0; $i<$entryCount; $i++) {
 				$item = new XMLElement('item');
 				$empty = true;
