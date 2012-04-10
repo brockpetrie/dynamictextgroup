@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="dynamictextgroup" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Dynamic Text Group</name>
+	<description>Dynamically add a text field or repeatable text field groups to an entry.</description>
+	<repo type="github">https://github.com/brockpetrie/dynamictextgroup</repo>
+	<url type="discuss">http://symphony-cms.com/discuss/thread/70781/</url>
+	<types>
+		<type>Field Types</type>
+	</types>
+	<authors>
+		<author>
+			<name github="brockpetrie" symphony="brockpetrie">Brock Petrie</name>
+			<website>http://www.brockpetrie.com</website>
+		</author>
+	</authors>
+	<dependencies>
+		<dependency>stage</dependency>
+	</dependencies>
+	<releases>
+		<release version="1.0" date="2011-06-05" min="2.2.0">Initial release</release>
+	</releases>
+	<media>
+		<item type="video" url="http://www.screenr.com/embed/KgAs">Overview I: Introduction</item>
+		<item type="video" url="http://www.screenr.com/embed/CMAs">Overview II: Advanced Options</item>
+		<item type="video" url="http://www.screenr.com/embed/6gAs">Overview III: Output and Filtering</item>
+	</media>
+</extension>
