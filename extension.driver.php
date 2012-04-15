@@ -50,7 +50,7 @@
 					`id` int(11) unsigned NOT NULL auto_increment,
 					`field_id` int(11) unsigned NOT NULL,
 					`fieldcount` tinyint(1),
-					`schema` varchar(5000),
+					`schema` text,
         	  		PRIMARY KEY  (`id`),
 			  		KEY `field_id` (`field_id`)
 				)"
