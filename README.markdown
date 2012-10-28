@@ -1,13 +1,13 @@
 # Dynamic Text Group
 
--  Version: 2.0dev6
+-  Version: 2.0
 -  Author: [Brock Petrie](http://www.brockpetrie.com)
--  Build Date: 2011-09-21
+-  Build Date: 2012-10-28
 -  Requirements: Symphony 2.2
 
 ## Description
 
-This field provides a method to dynamically add a text field or text field groups to a section entry. An example of its use would be for creating tracklists in a section for record albums. This extension would allow you to create as many track entries in each album entry as needed.
+This field provides a method to dynamically add groups of text fields and text-representable fields (including radio, checkbox and dropdown inputs) to an entry. An example of its use would be for creating tracklists in a section for record albums. This extension would allow you to create as many track entries in each album entry as needed.
 
 ## Usage
 
@@ -27,35 +27,39 @@ The Field Editor in v2 replaces the old custom schema field, and allows for easy
 
 ## Change log
 
-**Version 2.0dev6**
+**Version 2.0**
 
-- `2.0dev6b`: allow for bigger schemas in the `schema` column of the extension's DB table (from varchar(255) to varchar(5000)). manually upped the column length awhile ago in my dev environment and forgot to update the extension.driver.php file.
+- Official release.
+
+**Version 2.0 dev6**
+
+- `2.0 dev6`: allow for bigger schemas in the `schema` column of the extension's DB table (from varchar(255) to varchar(5000)). manually upped the column length awhile ago in my dev environment and forgot to update the extension.driver.php file.
 - Added 2 new fieldtypes: Checkbox and Radio. Checkbox allows for any amount of checked boxes in the subfield's column; Radio allows for only a single checked radio button in the subfield's column.
 - Fixed validation pattern presets (backslashes weren't being escaped).
 - Minor bugfixes and code improvements.
 
-**Version 2.0dev5**
+**Version 2.0 dev5**
 
 - Added option to declare validation rules for textfields; added 'number', 'email' and 'URI' pattern presets.
 - Added placeholder attribute to textfields.
 - Minor bugfixes
 
-**Version 2.0dev4**
+**Version 2.0 dev4**
 
 - Added option to choose between 2 fieldtypes for a subfield: Textfield (default) and Select List. If Select List is chosen, an additional field is displayed that allows for entering the preset options for the select list (entered as comma-separated values; e.g. 'Choice 1, Choice 2, Choice 3, Choice 4').
 - Stylistic changes
 
-**Version 2.0dev3**
+**Version 2.0 dev3**
 
 -  Added basic filtering capability. Accepted filter data is 'handle:value' (e.g. first-name:Brock), where 'handle' is the handle of one of your subfields, and 'value' is the value of said subfield.
 
-**Version 2.0dev2** 
+**Version 2.0 dev2** 
 
 -  Added option to allow for specific subfields to be required (not left empty).
 -  Warn and (sort of) prevent user from trying to save subfields with duplicate labels. Need to make it foolproof, but at least it throws a warning now.
 -  Data is now sent and stored as JSON.
 
-**Version 2.0dev1** 
+**Version 2.0 dev1** 
 
 -  Implemented the Field Editor.
 
