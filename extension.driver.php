@@ -28,7 +28,7 @@
 		public function about() {
 			return array(
 				'name' => 'Dynamic Text Group',
-				'version' => '1.0',
+				'version' => '2.0dev6',
 				'release-date' => NULL,
 				'author' => array(
 					'name' => 'Brock Petrie',
@@ -50,7 +50,7 @@
 					`id` int(11) unsigned NOT NULL auto_increment,
 					`field_id` int(11) unsigned NOT NULL,
 					`fieldcount` tinyint(1),
-					`schema` varchar(255),
+					`schema` text,
         	  		PRIMARY KEY  (`id`),
 			  		KEY `field_id` (`field_id`)
 				)"

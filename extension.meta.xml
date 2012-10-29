@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="dynamictextgroup" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	<name>Dynamic Text Group</name>
-	<description>Dynamically add a text field or repeatable text field groups to an entry.</description>
+	<description>Dynamically add groups of text fields and text-representable fields (including radio, checkbox and dropdown inputs) to an entry.</description>
 	<repo type="github">https://github.com/brockpetrie/dynamictextgroup</repo>
 	<url type="discuss">http://symphony-cms.com/discuss/thread/70781/</url>
 	<types>
@@ -17,6 +17,7 @@
 		<dependency>stage</dependency>
 	</dependencies>
 	<releases>
+		<release version="2.0" date="2012-10-28" min="2.2.0">2.0 release</release>
 		<release version="1.0" date="2011-06-05" min="2.2.0">Initial release</release>
 	</releases>
 	<media>

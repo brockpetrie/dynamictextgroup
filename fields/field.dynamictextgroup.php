@@ -23,7 +23,7 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#canFilter * * */
 		function canFilter() {
-			return false;
+			return true;
 		}
 	
 	
@@ -52,21 +52,29 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#displaySettingsPanel * * */
 		function displaySettingsPanel(&$wrapper, $errors=NULL) {
-	
+			
 			// Initialize field settings based on class defaults (name, placement)
 			parent::displaySettingsPanel($wrapper, $errors);
 			
-			// Field Number Chooser
-			$fieldset = new XMLElement('fieldset');
-			if (!$this->get('id') && $errors == NULL) {
-				$this->set('fieldcount', 2);
-				$group = new XMLElement('label', 'Number of text inputs per row<i>IMPORTANT: This cannot be changed once you save!</i><input name="fields[' . $this->get('sortorder') . '][fieldcount]" type="text" value="' . $this->get('fieldcount') . '" />');
+			// Field Editor
+			if ($this->get('id')) {
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery-ui-1.8.16.custom.min.js', 101, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/json2.js', 102, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery.ui.resizable.js', 103, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 104, false);
+				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 105, false);
+				
+				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
+				$tblocks .= '<input type="hidden" id="addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
+				$tblocks .= '<input type="hidden" id="delfields" name="fields['.$this->get('sortorder').'][delfields]" value="" />';
+				$tblocks .= '<input type="hidden" id="renfields" name="fields['.$this->get('sortorder').'][renfields]" value="" />';
+		
+				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div id="stageHolder"><div id="stage"></div><div id="messages"></div><a class="dtgButton" id="add">Add Field</a><br clear="all" /></div>'.$tblocks);
+				$wrapper->appendChild($fieldset);
 			} else {
-				$this->get('fieldcount');
-				$group = new XMLElement('label', 'Number of text inputs per row<i>Database table created. This value can no longer be changed.</i><input name="fields[' . $this->get('sortorder') . '][fielddisplay]" type="text" disabled="disabled" value="' . $this->get('fieldcount') . '" /><input name="fields[' . $this->get('sortorder') . '][fieldcount]" type="hidden" value="' . $this->get('fieldcount') . '" />');
+				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend>Please save the section to enable the Field Editor.<br /><br />');
+				$wrapper->appendChild($fieldset);
 			}
-			$fieldset->appendChild($group);
-			$wrapper->appendChild($fieldset);
 
 			// Behaviour
 			$fieldset = Stage::displaySettings(
@@ -76,13 +84,6 @@
 				array('constructable', 'draggable')
 			);
 			$group = $fieldset->getChildren();
-			$wrapper->appendChild($fieldset);
-			
-			// Add Custom Schema option
-			$fieldset = new XMLElement('fieldset', '<legend>Advanced</legend>');
-			$group = new XMLElement('label', 'Custom Schema<i>Optional. Read the documentation before putting anything here!</i>');
-			$group->appendChild(Widget::Input('fields['.$this->get('sortorder').'][schema]', $this->get('schema')));
-			$fieldset->appendChild($group);
 			$wrapper->appendChild($fieldset);
 
 			// General
@@ -103,17 +104,45 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#commit * * */
 		function commit() {
-	
 			// Prepare commit
 			if(!parent::commit()) return false;
 			$id = $this->get('id');
 			if($id === false) return false;
 			
-				// Set up fields
+			// Set up fields
 			$fields = array();
 			$fields['field_id'] = $id;
-			$fields['fieldcount'] = $this->get('fieldcount');
-			$fields['schema'] = $this->get('schema');
+			
+			// Parse schema
+			if ($this->get('schema') != '') {
+				$schema = json_decode($this->get('schema'));
+				$ct = count($schema);
+				$totalW = 100;
+				foreach ($schema as $i=>&$field) {
+					$field->handle = Lang::createHandle($field->label);
+					$totalW -= $field->width;
+				}
+				$schema[$ct-1]->width += $totalW;
+				
+				$fields['fieldcount'] = $ct;
+				$fields['schema'] = json_encode($schema);
+			}
+			
+			// Parse rename data
+			if ($this->get('renfields') != '') {
+				$renfields = json_decode($this->get('renfields'));
+				foreach ($renfields->handles as $key=>$rename) self::__alterTable(2, $rename, Lang::createHandle($renfields->labels[$key]));
+			}
+			// Parse delete data
+			if ($this->get('delfields') != '') {
+				$delfields = json_decode($this->get('delfields'));
+				foreach ($delfields->handles as $deletion) self::__alterTable(0, $deletion);
+			}
+			// Parse add data
+			if ($this->get('addfields') != '') {
+				$addfields = json_decode($this->get('addfields'));
+				foreach ($addfields->labels as $addition) self::__alterTable(1, Lang::createHandle($addition));
+			}
 	
 			// Save new stage settings for this field
 			$stage = $this->get('stage');
@@ -124,9 +153,33 @@
 			Symphony::Database()->query(
 				"DELETE FROM `tbl_fields_" . $this->handle() . "` WHERE `field_id` = '$id' LIMIT 1"
 			);
-	
+			
 			// Save new field setting
 			return Symphony::Database()->insert($fields, 'tbl_fields_' . $this->handle());
+			
+		}
+		
+		function __alterTable($mode, $col, $rename=NULL) {
+			// Function $mode options:
+			// 0 = Delete column; 	e.g.  __alterTable(0, 'badcolumn');
+			// 1 = Add column; 		e.g.  __alterTable(1, 'newcolumn');
+			// 2 = Rename column;	e.g.  __alterTable(2, 'newcolumnname', 'oldcolumnname');
+			switch ($mode) {
+				case 0:
+					// Delete column
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` DROP COLUMN `". $col ."`");
+					break;
+				case 1:
+					// Add column
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` ADD COLUMN `". $col ."` varchar(255) null");
+					break;
+				case 2:
+					// Rename column
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` CHANGE `". $col ."` `". $rename ."` varchar(255) null");
+					break;
+				default:
+					return false;
+			}
 		}
 	
 	
@@ -148,52 +201,33 @@
 				$settings[] = 'single';
 			}
 			
+			$schema = json_decode($this->get('schema'));
 			$fieldCount = $this->get('fieldcount');
-			$entryCount = count($data['textfield1']);
 			
-			// Check if schema exists and compile info
-			$schema = $this->get('schema');
-			if ($schema && $schema != '') {
-				$fieldLabels = array();
-				$fieldWidths = array();
-				
-				$splitMe = explode('|',$schema);
-				
-				foreach ($splitMe as $i => $field) {
-					$index = $i+1;
-					$splitAgain = explode(',', $field);
-					$fieldLabels[$i] = ($splitAgain[0] && $splitAgain[0] != null) ? $splitAgain[0] : null;
-					$fieldWidths[$i] = ($splitAgain[1] && $splitAgain[1] != null) ? (int)$splitAgain[1] : null;
-				}
-			} else {	
-				$fieldLabels = null;
-				$fieldWidths = null;
-			}
-			$fieldWidths = Textgroup::getWidths($fieldCount, $fieldWidths);
 			
 			// Populate existing entries
 			$content = array();
 			if(is_array($data)) {
-				$fieldValues = array();
-				for ($i=0; $i<$fieldCount; $i++) {
-					if(!is_array($data['textfield'.($i+1)])) $data['textfield'.($i+1)] = array($data['textfield'.($i+1)]);
+				$entryCount = 1;
+				foreach ($data as &$row) {
+					if (!is_array($row)) $row = array($row);
+					if (count($row) > $entryCount) $entryCount = count($row);
 				}
 				
 				for($i=0; $i<$entryCount; $i++) {
-					for ($n=0; $n<$fieldCount; $n++) {
-						$entryValues[$i][$n] = $data['textfield'.($n+1)][$i];
+					foreach ($schema as $field) {
+						$entryValues[$i][] = $data[$field->handle][$i];
 					}
-					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], null, $fieldLabels, $fieldWidths);
+					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], NULL, $schema);
 				}
 			}
-			
 			// Blank entry
 			else {
-				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $fieldLabels, $fieldWidths);
+				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema);
 			}
 			
 			// Add template
-			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $fieldLabels, $fieldWidths);
+			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema);
 		
 			// Create stage
 			$stage = Stage::create('dynamictextgroup', $this->get('id'), implode($settings, ' '), $content);
@@ -204,9 +238,7 @@
 			$holder->appendChild($label);
 			
 			// Append Stage
-			if($stage) {
-				$holder->appendChild($stage);
-			}
+			if($stage) $holder->appendChild($stage);
 			
 			if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($holder, $flagWithError));
 			else $wrapper->appendChild($holder);
@@ -215,29 +247,104 @@
 		
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#checkPostFieldData * * */
 		public function checkPostFieldData($data, &$message, $entry_id=NULL){
-			$message = NULL;
+			$message = __("'%s' is a required field.", array($this->get('label')));
 			
-			$count = $this->get('fieldcount');
-			$entryCount = 1;
-			for ($i=1; $i<=$count; $i++) {
-				$targ = 'textfield'.$i;
-				if (count($data[$targ]) > $entryCount) $entryCount = count($data[$targ]);
-			}
-
-			if($this->get('required') == 'yes'){
-				$empty = true;
-				for ($i=1; $i<=$count; $i++) {
-					for ($d=0; $d<$entryCount; $d++) {
-						$targ = 'textfield'.$i;
-						if ($data[$targ][$d] != '') $empty = false;
+			$schema = json_decode($this->get('schema'));
+			
+			$sampling = $schema[0]->handle;
+			$entryCount = count($data[$sampling]);
+			
+			$empty = true;
+			
+			$badValidate = false;
+			$badRadio = false;
+			$badCheck = false;
+			
+			$checkItems = array();
+			$radioItems = array();
+			
+			for($i=0; $i<$entryCount; $i++) {
+				$emptyRow = true;
+				$emptyReq = false;
+				foreach ($schema as $f=>$field) {
+					// Get/set required option
+					$req = $field->options->required ? true : false;
+					
+					switch ($field->options->type) {
+						case 'text':
+							// Check if field passes any rules
+							$rule = $field->options->validationRule != '' ? $field->options->validationRule : false;
+							if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
+								$badValidate[] = array('handle' => $field->handle.'-holder', 'index' => $i);
+							}
+							// Check if required subfield is empty
+							if ($req && $data[$field->handle][$i] == '') {
+								$emptyReq = true;
+							} else if ($data[$field->handle][$i] != '') {
+								$empty = false;
+								$emptyRow = false;
+							}
+							break;
+							
+						case 'select':
+							if ($req && $data[$field->handle][$i] == '') {
+								$emptyReq = true;
+							} else if ($data[$field->handle][$i] != '') {
+								$empty = false;
+								$emptyRow = false;
+							}
+							break;
+							
+						case 'checkbox':
+							if ($i == 0) $checkItems[$f] = false;
+							if ($data[$field->handle][$i] == 'yes') {
+								$checkItems[$f] = true;
+								$emptyRow = false;
+								$empty = false;
+							}
+							if ($i == $entryCount-1  &&  $entryCount > 0  &&  !$checkItems[$f]  &&  $req  &&  !$empty) {
+								$badCheck[] = array('handle' => $field->handle.'-holder');
+							}
+							break;
+							
+						case 'radio':
+							if ($i == 0) $radioItems[$f] = false;
+							if ($data[$field->handle][$i] == 'yes') {
+								$radioItems[$f] = true;
+								$emptyRow = false;
+								$empty = false;
+							}
+							if ($i == $entryCount-1  &&  $entryCount > 0  &&  !$radioItems[$f]  &&  $req  &&  !$empty) {
+								$badRadio[] = array('handle' => $field->handle.'-holder');
+							}
+							break;
 					}
 				}
 				
-				if($empty) {
-					$message = __("'%s' is a required field.", array($this->get('label')));
+				if (!$emptyRow && $emptyReq) {
+					$message = __("'%s' contains required fields that are empty.", array($this->get('label')));
 					return self::__MISSING_FIELDS__;
 				}
 			}
+			
+			if ($badValidate){
+				$badValidate = json_encode($badValidate);
+				$message = __("'%s' contains invalid data. Please check the contents.<input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badValidate));
+				return self::__INVALID_FIELDS__;
+			}
+			if ($badRadio) {
+				$badRadio = json_encode($badRadio);
+				$message = __("'%s' contains required fields that are empty. <input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badRadio));
+				return self::__MISSING_FIELDS__;
+			}
+			if ($badCheck) {
+				$badCheck = json_encode($badCheck);
+				$message = __("'%s' contains required fields that are empty. <input type='hidden' id='badItems' value='%s' />", array($this->get('label'), $badCheck));
+				return self::__MISSING_FIELDS__;
+			}
+			
+			if ($empty && $this->get('required') == 'yes') return self::__MISSING_FIELDS__;
+			
 			return self::__OK__;
 		}
 		
@@ -246,36 +353,30 @@
 		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL) {
 			$status = self::__OK__;
 			if(!is_array($data)) return NULL;
-		
-			// Clean up dates
-			$result = array();
 			
+			$result = array();
 			$count = $this->get('fieldcount');
 			
 			// Check for the field with the most values
-			$entryCount = 1;
-			for ($i=1; $i<=$count; $i++) {
-				$targ = 'textfield'.$i;
-				if (count($data[$targ]) > $entryCount) $entryCount = count($data[$targ]);
-			}
+			$entryCount = 0;
+			foreach ($data as $row) if (count($row) > $entryCount) $entryCount = count($row);
 			
+			// Check for empties
 			$empty = true;
+			
 			for($i=0; $i < $entryCount; $i++) {
 				$emptyEntry = true;
-				for($f=1; $f<=$count; $f++) {
-					$targ = 'textfield'.$f;
-					if (!empty($data[$targ][$i])) {
-						$result[$targ][$i] = $data[$targ][$i];
+				foreach ($data as &$field) {
+					if (!empty($field[$i])) {
 						$empty = false;	
 						$emptyEntry = false;	
 					} else {
-						$result[$targ][$i] = ' ';	
+						$field[$i] = ' ';
 					}
 				}
 				if ($emptyEntry) {
-					for($f=1; $f<=$count; $f++) {
-						$targ = 'textfield'.$f;
-						unset($result[$targ][$i]);
+					foreach ($data as &$field) {
+						unset($field[$i]);
 					}
 				}
 			}
@@ -283,24 +384,18 @@
 			if ($empty) {
 				return null;
 			} else {
-				return $result;
+				return $data;
 			}
+
 		}
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#createTable * * */
 		function createTable() {
-			$count = $this->get('fieldcount');
-			$make = '';
-			for ($i=1; $i <= $count; $i++) {
-				$make .= '`textfield'. $i .'` varchar(255) NULL,';
-			}
-			$this->set('make', $make);
 			return Symphony::Database()->query(
 				"CREATE TABLE IF NOT EXISTS `tbl_entries_data_" . $this->get('id') . "` (
 				`id` int(11) unsigned NOT NULL auto_increment,
 				`entry_id` int(11) unsigned NOT NULL,
-				". $this->get('make') ."
 				PRIMARY KEY (`id`),
 				KEY `entry_id` (`entry_id`)
 				);"
@@ -310,9 +405,16 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#prepareTableValue * * */
 		function prepareTableValue($data, XMLElement $link=NULL) {
-			if(!is_array($data['textfield1'])) $data['textfield1'] = array($data['textfield1']);
-			if ($data['textfield1'][0] != null) {
-				$strung = count($data['textfield1']) == 1 ? count($data['textfield1']) . ' item' : count($data['textfield1']) . ' items';
+			if (is_array($data)) {
+				$keys = array_keys($data);
+				$key = $keys[0];
+				
+				if(!is_array($data[$key])) $data[$key] = array($data[$key]);
+				if ($data[$key][0] != null) {
+					$strung = count($data[$key]) == 1 ? count($data[$key]) . ' item' : count($data[$key]) . ' items';
+				} else {
+					$strung = null;
+				}
 			} else {
 				$strung = null;
 			}
@@ -329,9 +431,35 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#buildDSRetrivalSQL * * */
 		/*
-		function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation = false) {
-		}
+		**	Accepted filter:
+		**	handle:value	(e.g. first-name:Brock)
+		**  Where 'handle' is equal to the handle of a subfield, and 'value' is equal to the input of said subfield. All entries with a matching value in this subfield will be returned.
 		*/
+		public function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation = false) {
+			$field_id = $this->get('id');
+			
+			if (preg_match('/.*:.*/', $data[0])) {
+				$this->_key++;
+				$joins .= "
+					LEFT JOIN
+						`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+					ON
+						(e.id = t{$field_id}_{$this->_key}.entry_id)
+				";
+				
+				$data[0] = explode(':', trim($this->cleanValue($data[0])));
+				$handle = $data[0][0];
+				$value = $data[0][1];
+				
+				$where .= "
+					AND (
+						`t{$field_id}_{$this->_key}`.`{$handle}` IN ('{$value}')
+					)
+				";
+			}
+
+			return true;
+		}
 	
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#groupRecords * * */
@@ -343,70 +471,45 @@
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#appendFormattedElement * * */
 		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id) {
+			// Get field properties and decode schema
 			$fieldCount = $this->get('fieldcount');
-			
-			// Check if schema exists and compile info
-			$schema = $this->get('schema');
-			if ($schema && $schema != '') {
-				$fieldLabels = array();
-				$fieldWidths = array();
+			$schema = json_decode($this->get('schema'));
+			$sampling = $schema[0]->handle;
+			$entryCount = count($data[$sampling]);
 				
-				$splitMe = explode('|',$schema);
-				
-				foreach ($splitMe as $i => $field) {
-					$index = $i+1;
-					$splitAgain = explode(',', $field);
-					$fieldLabels[$i] = ($splitAgain[0] && $splitAgain[0] != null) ? General::sanitize($splitAgain[0]) : null;
-				}
-			} else {	
-				$fieldLabels = null;
-			}
-			
-			// Parse result data
-			$entryCount = count($data['textfield1']);
-						
+			// Parse data
 			$textgroup = new XMLElement($this->get('element_name'));
-			
+			if(is_array($data)) {
+				foreach ($data as &$row) { if (!is_array($row)) $row = array($row); }
+			}
 			for($i=0; $i<$entryCount; $i++) {
 				$item = new XMLElement('item');
 				$empty = true;
-				
-				for ($f=1; $f<=$fieldCount; $f++) {
-					$targ = 'textfield'.$f;
-					
-					if(!is_array($data[$targ])) $data[$targ] = array($data[$targ]);
-				
-					$label = ($fieldLabels != null && $fieldLabels[$f-1] != null) ? Lang::createHandle($fieldLabels[$f-1]) : 'textfield'.$f;
-					$val = $data[$targ][$i] != ' ' ? General::sanitize($data[$targ][$i]) : '';
-					$item->appendChild(
-						${'textfield'.$f} = new XMLElement($label, $val)
-					);
+				foreach ($schema as $field) {
+					$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
+					$item->appendChild(new XMLElement($field->handle, $val));
 				}
-				
 				$textgroup->appendChild($item);
 			}
 	
-			// append to data source
+			// Append to data source
 			$wrapper->appendChild($textgroup);
-			
 		}
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#getParameterPoolValue * * */
+		/*
 		public function getParameterPoolValue($data) {
-			$start = array();
-			foreach($data['textfield1'] as $item) {
-				$start[] = General::sanitize($item);
-			}
-			return implode(',', $start);
 		}
+		*/
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#getExampleFormMarkup * * */
 		public function getExampleFormMarkup() {
 			$label = Widget::Label($this->get('label'));
-			$label->appendChild(Widget::Input('fields['.$this->get('element_name').'][textfield1][]'));
-			
+			$schema = json_decode($this->get('schema'));
+			$note = new XMLElement('strong', 'IMPORTANT: the event sample code is not updated when you make changes to DynamicTextGroup subfields in the section editor. Remember that your front-end fields must always match the back-end fields!');
+			foreach ($schema as $field) $label->appendChild(Widget::Input('fields['.$this->get('element_name').']['.$field->handle.'][]'));
 			return $label;
 		}
 	}
