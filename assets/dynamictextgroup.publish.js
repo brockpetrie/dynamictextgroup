@@ -34,7 +34,6 @@
 		},
 		
 		constructed: function() {
-			$('.styled').customStyle();
 			$('.fieldtype-radio').each(function() {
 				var checker = $('input[type="radio"]', $(this));
 				$(checker).change(function() {
@@ -54,20 +53,60 @@
 	// Stage stuff
 	
 	$(document).ready(function() {
-		$('.styled').customStyle();
+		$('.dtg .styled').each(function() {
+			var sel = $(this);
+			
+			/*$('option.placeholder', this).attr('value', placeholder);*/
+			sel.select2({allowClear: true});
+			/*$('option.placeholder', this).attr('value', '');
+			sel.removeClass('styled');
+			
+			sel.on("change", function() {
+				if (sel.select2('val') == '') {
+					sel.select2('data', {id: '', text: placeholder});
+				}
+			});*/
+		});
 		DynamicTextGroup.parseBadItems();
 		DynamicTextGroup.constructed();
 		
-		// Initialize Stage
+		// Initialize Duplicator
 		$('div.field-dynamictextgroup').each(function() {
 			var manager = $(this),
 				help = manager.find('label i'),
-				stage = manager.find('div.stage'),
-				selection = stage.find('ul.selection');
-			
-			stage.bind('constructanim', function() {
-				DynamicTextGroup.constructed();
+				stage = manager.find('div.frame.dark'),
+				selection = stage.find('ol');
+				
+			$('header', manager).mousedown(function() {
+				$('.focus input', manager).blur();
 			});
+			
+			if(!stage.is('.single')) {
+				stage.symphonyDuplicator({
+					orderable: true,
+					collapsible: false
+				});
+				selection.symphonyOrderable({
+					items: 'li',
+					handles: 'header',
+					ignore: 'input, textarea, select, a, span',
+					delay: 500
+				});
+			}
+			
+			stage.on('constructshow.duplicator', 'li', function(event) {
+				$('.styled', this).each(function() {
+					$('option.placeholder', this).attr('value', $('option.placeholder', this).text());
+					$(this).select2({allowClear: true});
+					$('option.placeholder', this).attr('value', '');
+					$(this).removeClass('styled');
+				});
+			});
+			
+			//$('.fields', manager).click(function() { event.stopPropagation(); });
+			/*stage.bind('constructanim', function() {
+				DynamicTextGroup.constructed();
+			});*/
 			
 			// Hide label help
 			help.hide();
@@ -79,23 +118,23 @@
 
 			// Text input focus
 			selection.delegate('input', 'focus.textgroup', function(event) {
-				var dofocus = 	$(this).parent().parent().addClass('focus');
+				var dofocus = 	$(this).parent().parent().parent().addClass('focus');
 				var label = 	$(this).parent().find('label').html();
-				//help.html(label);
-				//help.fadeIn('fast');
+				help.html(label);
+				help.fadeIn('fast');
 			});
 			selection.delegate('input', 'blur.textgroup', function(event) {
-				$(this).parent().parent().removeClass('focus');
-				//help.hide();
+				$(this).parent().parent().parent().removeClass('focus');
+				help.hide();
 			});
 			
 			// Select focus
 			selection.delegate('select', 'focus.textgroup', function(event) {
-				var dofocus = 	$(this).parent().parent().addClass('focus');
+				var dofocus = 	$(this).parent().parent().parent().addClass('focus');
 				var label = 	$(this).parent().find('label').html();
 			});
 			selection.delegate('select', 'blur.textgroup', function(event) {
-				$(this).parent().parent().removeClass('focus');
+				$(this).parent().parent().parent().removeClass('focus');
 			});
 			
 			
@@ -106,7 +145,7 @@
 	// Script to stylize the select lists
 	$.fn.extend({
 		customStyle : function(options) {
-			if(!$.browser.msie || ($.browser.msie&&$.browser.version>6)){
+			/*if(!$.browser.msie || ($.browser.msie&&$.browser.version>6)){
 				return this.each(function() {
 					var currentSelected = $(this).find(':selected');
 					$(this).after('<span class="customStyleSelectBox"><span class="customStyleSelectBoxInner">'+currentSelected.text()+'</span></span>').css({position:'absolute', opacity:0,fontSize:$(this).next().css('font-size')});
@@ -123,7 +162,7 @@
 					});
 					$(this).removeClass('styled');
 				});
-			}
+			}*/
 		}
 	});
 	

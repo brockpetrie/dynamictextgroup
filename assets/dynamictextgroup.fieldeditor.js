@@ -22,7 +22,7 @@
 
 		init: function () {
 			// Initialize stage area
-			dtgEditor.area = $('#stageHolder').innerWidth()-8;
+			dtgEditor.area = $('#stageHolder').innerWidth()-10;
 			$('#stage').width(dtgEditor.area);
 			
 			// Bind new field creation event to Add button
@@ -33,7 +33,7 @@
 			var dupeMsg = $('<div></div>').attr('id','dupeMsg').addClass('msg msgbad').text('Duplicates exist! All labels must be unique.').hide().appendTo($('#messages'));
 			
 			$(window).resize(function() {
-				dtgEditor.area = $('#stageHolder').innerWidth()-8;
+				dtgEditor.area = $('#stageHolder').innerWidth()-10;
 				$('#stage').width(dtgEditor.area);
 			});
 		},
@@ -67,7 +67,15 @@
 				field.options = {};
 				field.options.required = $('input[name="required"]', $(this)).attr('checked');
 				field.options.type = $('#fieldType', $(this)).val();
-				if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
+				//if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
+				if (field.options.type == 'select') {
+					var str = $('#selectItems', $(this)).val();
+					if (str.match("^\\[") && str.match("\\]$")) {
+						field.options.selectItems = JSON.parse(str);
+					} else {
+						field.options.selectItems = str;
+					}
+				}
 				if (field.options.type == 'text') field.options.validationRule = $('#validationRule', $(this)).val();
 				schematic.push(field);
 				
@@ -128,7 +136,7 @@
 				// Field Options holder
 				var optionsHolder = $('<div class="options"></div>');
 				var originalName = $('<input type="hidden" style="display:none;" id="original" />').val(fLabel).appendTo($(optionsHolder));
-				var options = $('<ul class="optiondrop"><span class="shadow"></span></ul>');
+				var options = $('<ul class="optiondrop"></ul>');
 				$(options).hide();
 				$(optionsHolder).click(function() {
 					$(options).slideToggle(150);
@@ -146,7 +154,7 @@
 				
 				// Select options
 				var selectItems = $('<input type="text" name="selectItems" id="selectItems" value="" placeholder="e.g. Option 1, Option 2, Option 3" />');
-				var selectItemsLabel = $('<label for="selectItems">List Values (comma-separated)<br /></label>').append(selectItems);
+				var selectItemsLabel = $('<label for="selectItems">List Values<br /></label>').append(selectItems).append('<em>Comma-separated values or JS object</em>');
 				
 				// Validation rule
 				var validationRule = $('<input type="text" name="validationRule" id="validationRule" value="" placeholder="Enter a regex pattern" />');
@@ -171,7 +179,8 @@
 				switch(fOpts.type) {
 					case 'select':
 						$(selectItemsHolder).show();
-						$(selectItems).val(fOpts.selectItems);
+						var items = JSON.stringify(fOpts.selectItems);
+						$(selectItems).val(items);
 						break;
 					case 'text':
 						$(validationRuleHolder).show();
@@ -204,7 +213,7 @@
 				
 				
 				// Field Delete button
-				var deleteButton = $('<a class="dtgButton del" href="#">Delete Field</a>').bind('click',function() { dtgEditor.fieldMaster(boxy); return false; });
+				var deleteButton = $('<button class="delete" href="#">Delete Field</button>').bind('click',function() { dtgEditor.fieldMaster(boxy); return false; });
 				$('<li></li>').append(deleteButton).appendTo($(options));
 				
 				$(optionsHolder).appendTo($('.inner', boxy));
@@ -316,16 +325,19 @@
 		
 		refreshStage: function() {
 			// Reinitiate the sortable object
+			$('.handle', '#stage').mousedown(function() {
+				$('.tfield', '#stage').blur();
+			});
 			$("#stage").sortable({
 				placeholder	: 'placeholder',
 				handle		: '.handle',
 				start		: function(event, ui) {
-					$(ui.item).fadeTo('fast', 0.75);
-					$('.placeholder').css('width', $(ui.item).innerWidth()-6);
+					//$(ui.item).fadeTo('fast', 0.75);
+					$('.placeholder').css('width', $(ui.item)[0].style.width).append('<div class="placeholder-inner"></div>');
 				},
 				stop		: function(event, ui) {
 					dtgEditor.boxOrder = $('#stage').sortable('toArray');
-					$(ui.item).fadeTo('fast', 1);
+					//$(ui.item).fadeTo('fast', 1);
 					dtgEditor.initResize();
 				}
 			});

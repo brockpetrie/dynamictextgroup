@@ -32,9 +32,9 @@
 			// Create element
 			return new XMLElement(
 				'li', 
-				'<span>
+				'<header>
 					<span class="fields">' . $fields . '<div class="clear"></span>
-				</span>', 
+				</header>', 
 				array('class' => implode($classes, ' '))
 			);
 		}
@@ -57,8 +57,9 @@
 			$width = 'style="width:'. $width .'% !important;"';
 			$select = '<span class="fieldHolder '. $handle .'-holder'. $reqclas .'" '. $width .'>';
 			$select .= '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
-			$select .= '<select id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" class="styled field-'. $handle .'">';
-			$select .= '<option value="">'. $label .'</option>';
+			$select .= '<select id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" data-placeholder="'. $label .'" class="styled field-'. $handle .'">';
+			//$select .= '<option value="" class="placeholder">'. $label .'</option>';
+			$select .= '<option></option>';
 			//$select .= '<optgroup label="'. $label .'">';
 			$select .= '<optgroup label="Select one:">';
 			foreach ($fSelectItems as &$item) {

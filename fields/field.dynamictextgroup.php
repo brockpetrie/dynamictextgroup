@@ -6,15 +6,12 @@
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 
 	require_once(EXTENSIONS . '/dynamictextgroup/lib/class.textgroup.php');
-	if(!class_exists('Stage')) {
-		require_once(EXTENSIONS . '/dynamictextgroup/lib/stage/class.stage.php');
-	}
 
 	Class fielddynamictextgroup extends Field {
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#__construct * * */
-		function __construct(&$parent) {	
-			parent::__construct($parent);
+		function __construct() {	
+			parent::__construct();
 			$this->_name = __('Dynamic Text Group');
 			$this->_required = true;
 			$this->set('required', 'no');
@@ -65,25 +62,27 @@
 				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 105, false);
 				
 				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
+				$tblocks .= '<span>'.$this->get('schema').'</span>';
 				$tblocks .= '<input type="hidden" id="addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
 				$tblocks .= '<input type="hidden" id="delfields" name="fields['.$this->get('sortorder').'][delfields]" value="" />';
 				$tblocks .= '<input type="hidden" id="renfields" name="fields['.$this->get('sortorder').'][renfields]" value="" />';
 		
-				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div id="stageHolder"><div id="stage"></div><div id="messages"></div><a class="dtgButton" id="add">Add Field</a><br clear="all" /></div>'.$tblocks);
+				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div id="stageHolder" class="frame empty"><ol id="stage"></ol><div id="messages"></div><button id="add">Add Field</button><br clear="all" /></div>'.$tblocks);
 				$wrapper->appendChild($fieldset);
+				
+				
+				//<a class="dtgButton" id="add">Add Field</a>
 			} else {
 				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend>Please save the section to enable the Field Editor.<br /><br />');
 				$wrapper->appendChild($fieldset);
 			}
 
-			// Behaviour
-			$fieldset = Stage::displaySettings(
-				$this->get('id'), 
-				$this->get('sortorder'), 
-				__('Behaviour'),
-				array('constructable', 'draggable')
-			);
-			$group = $fieldset->getChildren();
+			// Options
+			$fieldset = new XMLElement('fieldset', '<legend>Options</legend>');
+	        $checkbox = Widget::Input('fields[' . $this->get('sortorder') . '][allow_multiple]', 'yes', 'checkbox');
+	        if($this->get('allow_multiple') == 1) $checkbox->setAttribute('checked', 'checked');
+	        $setting = new XMLElement('label', __('%s Allow creation of new items', array($checkbox->generate())), array('class' => 'column'));
+	        $fieldset->appendChild($setting);
 			$wrapper->appendChild($fieldset);
 
 			// General
@@ -112,6 +111,9 @@
 			// Set up fields
 			$fields = array();
 			$fields['field_id'] = $id;
+			
+			// Set up options
+			$fields['allow_multiple'] = ($this->get('allow_multiple') ? 1 : 0);
 			
 			// Parse schema
 			if ($this->get('schema') != '') {
@@ -143,11 +145,6 @@
 				$addfields = json_decode($this->get('addfields'));
 				foreach ($addfields->labels as $addition) self::__alterTable(1, Lang::createHandle($addition));
 			}
-	
-			// Save new stage settings for this field
-			$stage = $this->get('stage');
-			$stage['destructable'] = 1;
-			Stage::saveSettings($this->get('id'), $stage, 'dynamictextgroup');
 
 			// Delete old field settings
 			Symphony::Database()->query(
@@ -187,15 +184,14 @@
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
 	
 			// Append assets
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/lib/stage/stage.publish.js', 101, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/lib/stage/stage.publish.css', 'screen', 102, false);
+			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.min.js', 101, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 102, false);
 			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
 			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
 			
 			// Get settings
-			$settings = array();
-			$stage = Stage::getComponents($this->get('id'));
-			if(in_array('constructable', $stage)) {
+			$settings = array('dark', 'frame');
+			if($this->get('allow_multiple') == 1) {
 				$settings[] = 'multiple';
 			} else {
 				$settings[] = 'single';
@@ -204,7 +200,15 @@
 			$schema = json_decode($this->get('schema'));
 			$fieldCount = $this->get('fieldcount');
 			
-			
+			// Create duplicator
+			$duplicator = new XMLElement('div', null, array(
+				'class' => implode(' ', $settings)
+			));
+			$list = new XMLElement('ol', null, array(
+				'data-add' => __('Create New'),
+				'data-remove' => __('Remove')
+			));
+						
 			// Populate existing entries
 			$content = array();
 			if(is_array($data)) {
@@ -218,27 +222,32 @@
 					foreach ($schema as $field) {
 						$entryValues[$i][] = $data[$field->handle][$i];
 					}
-					$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], NULL, $schema);
+					$list->appendChild(
+						Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], 'dtg', $schema)
+					);
 				}
 			}
 			// Blank entry
 			else {
-				$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, NULL, $schema);
+				$list->appendChild(
+					Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'dtg empty', $schema)
+				);
 			}
 			
 			// Add template
-			$content[] = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema);
-		
-			// Create stage
-			$stage = Stage::create('dynamictextgroup', $this->get('id'), implode($settings, ' '), $content);
+			$template = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema);
+			$template->setAttribute('data-name', 'dynamictextgroup');
+			$template->setAttribute('data-type', 'dynamictextgroup');
+			$list->appendChild($template);
+			
 			
 			// Field label
 			$holder = new XMLElement('div');
-			$label = new XMLElement('label', $this->get('label') . '<i>' . __('Help') . '</i>');
+			$label = new XMLElement('label', $this->get('label'));
 			$holder->appendChild($label);
 			
-			// Append Stage
-			if($stage) $holder->appendChild($stage);
+			$duplicator->appendChild($list);
+			$holder->appendChild($duplicator);
 			
 			if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($holder, $flagWithError));
 			else $wrapper->appendChild($holder);
@@ -367,7 +376,7 @@
 			for($i=0; $i < $entryCount; $i++) {
 				$emptyEntry = true;
 				foreach ($data as &$field) {
-					if (!empty($field[$i])) {
+					if (!empty($field[$i]) || $field[$i] == '0') {
 						$empty = false;	
 						$emptyEntry = false;	
 					} else {

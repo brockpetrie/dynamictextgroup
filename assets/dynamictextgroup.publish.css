@@ -4,37 +4,49 @@
  * *	@source: http://github.com/brockpetrie/dynamictextgroup
  * */
 	
-.field-dynamictextgroup div.stage ul.selection li { padding-right: 0; }
+.field-dynamictextgroup div.duplicator ul.selection li { padding-right: 0; }
 
-.field-dynamictextgroup div.stage span {
+.field-dynamictextgroup div.duplicator span {
 	padding: 3px 42px 4px 16px;
+	margin: 0;
 	display: block;
 	width: 100%;
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
+	line-height: 1em;
 	}
 
-.field-dynamictextgroup div.stage span.fields {
+.field-dynamictextgroup ol > li header {
+	padding-right: 60px;
+	padding: 7px 60px 7px 14px;
+	background: rgba(245,245,245,0);
+	}
+	.frame.orderable.multiple > ol > li header { cursor: pointer; }
+	.field-dynamictextgroup ol > li header.focus {
+		padding-right: 60px;
+		padding: 7px 60px 7px 14px;
+		background: rgba(0,0,0,0.04);
+		}
+
+.field-dynamictextgroup div.duplicator span.fields {
 	background:none !important;
 	padding: 0px;
 	width: 100%;
 	}
-.field-dynamictextgroup div.stage span.fieldHolder {
+.field-dynamictextgroup div.duplicator span.fieldHolder {
 	background:none !important;
 	padding: 0 3px 0 0;
 	width: 50%;
 	position:relative;
 	float: left;
 	}
-	.field-dynamictextgroup div.stage span.fieldHolder span {
-		}
 
-.field-dynamictextgroup div.stage div.clear {
+.field-dynamictextgroup div.duplicator div.clear {
 	clear:both;
 	}
 
-.field-dynamictextgroup div.stage span.fields em.label {
+.field-dynamictextgroup div.duplicator span.fields em.label {
 	color: #BBB;
 	position: absolute;
 	top:0;
@@ -43,24 +55,103 @@
 	}
 	label > i > span.req { color:#d43; }
 	.invalid label > i > span.req { color:#fff; }
-.field-dynamictextgroup div.stage span.fields em.end.label {
+.field-dynamictextgroup div.duplicator span.fields em.end.label {
 	top: 28px;
+	}
+
+.field-dynamictextgroup div.duplicator .destructor {
+	top: 10px;
+	}
+
+/*	*	*	Input Styling	*	*	*/
+.field-dynamictextgroup header label {
+	margin: 0;
+	}
+.field-dynamictextgroup header label.fieldtype-radio-label { padding: 3px 0 0 8px; }
+.field-dynamictextgroup header label.fieldtype-checkbox-label { padding: 4px 0 0 8px; }
+.field-dynamictextgroup header label.fieldtype-radio-label input,
+.field-dynamictextgroup header label.fieldtype-checkbox-label input { margin-right: 3px; }
+.field-dynamictextgroup header input {
+	margin: 0;
+	}
+	.field-dynamictextgroup li.ordering header input {
+		border-color: #44689e;
+		}
+	.field-dynamictextgroup header input[type="text"] {
+		height: 24px;
+		}
+
+
+/*	*	*	Select Styling	*	*	*/
+.select2-container {
+	width: 100%;
+	}
+.select2-search input {
+	min-height: 24px;
+	height: 24px;
+	margin-top: 3px;
+	border-radius: 2px;
+	}
+	.select2-search input:focus {
+		box-shadow: none;
+		border-color: #aaa;
+		}
+.select2-container > a {
+	width: 100%;
+	box-sizing: border-box;
+	margin: 0 !important;
+	height: 24px !important;
+	box-shadow: 0 2px 2px rgba(0,0,0,0.05);
+	padding: 0 8px !important;
+	}
+	.select2-container-active > a {
+		border: 1px solid rgba(0,0,0,0.25) !important;
+		box-shadow: none !important;
+		}
+	.field-dynamictextgroup div.duplicator .select2-container > a span {
+		padding: 5px 5px 5px 2px;
+		height: 100%;
+		box-sizing: border-box;
+		color: #666;
+		background: url(images/select-arrows.png) right center no-repeat;
+		}
+.select2-container > a div {
+	background: none;
+	border: none;
+	display: none !important;
+	}
+.select2-container > a abbr {
+	top: 5px;
+	}
+.select2-container > a div b {
+	background: url(images/select-arrows.png) no-repeat 5px 6px;
+	opacity: 0.75;
+	}
+.select2-dropdown-open > a {
+	border-bottom: none;
+	}
+.select2-dropdown-open > a div b {
+	opacity: 0.9;
+	}
+
+ul.select2-results > li.placeholder {
+	display: none !important;
 	}
 
 
 
-/*	*	*	Focus Styling	*	*	*/
-.field-dynamictextgroup div.stage span.fields.focus input,
-.field-dynamictextgroup div.stage span.fields.focus .customStyleSelectBox {
+/*	*	*	Focus Styling	*	*	
+.field-dynamictextgroup div.duplicator span.fields.focus input,
+.field-dynamictextgroup div.duplicator span.fields.focus .customStyleSelectBox {
 	box-shadow: 0 0 5px #a7a7a7 !important;
 	-webkit-box-shadow: 0 0 5px #a7a7a7 !important;
 	-moz-box-shadow: 0 0 5px #a7a7a7 !important;
 	}
-.field-dynamictextgroup div.stage span.fields input:focus { outline: none; }
+.field-dynamictextgroup div.duplicator span.fields input:focus { outline: none; }
+*/
 
 
-
-/*	*	*	Bad/invalid item styling	*	*	*/
+/*	*	*	Bad/invalid item styling	*	*	
 .field-dynamictextgroup div.invalid {
 	padding: 0.75em 1em 0.75em;
 	background-color: #D42;
@@ -90,11 +181,11 @@
 	border: 1px solid #C2C2C2 !important;
 	border-bottom-color:#bbb !important;
 	}
+*/
 
 
-
-/*	*	*	Textfield styling	*	*	*/
-.field-dynamictextgroup div.stage span.fields input[type="text"] {
+/*	*	*	Textfield styling	*	*	
+.field-dynamictextgroup div.duplicator span.fields input[type="text"] {
 	width: 100%;
 	font-size: 109.09%;
 	border: 1px solid #C2C2C2;
@@ -111,11 +202,11 @@
 	border-radius: 2px;
 	float: left;
 	}
-
+*/
 
 
 /*	*	*	Select list styling	*	*	*/
-.field-dynamictextgroup div.stage span.fields select {
+/*.field-dynamictextgroup div.duplicator span.fields select {
 	position:relative;
 	top:3px;
 	font-size: 109.09%;
@@ -146,14 +237,14 @@
 		background:url(images/select-arrows.png) no-repeat center right !important;
 		padding:0 !important;
 		}
-	span.customStyleSelectBoxInner { background:url(images/select-arrows.png) no-repeat center right !important; }
+	span.customStyleSelectBoxInner { background:url(images/select-arrows.png) no-repeat center right !important; }*/
 
 
 
-/* Radio Styling*/
-.field-dynamictextgroup div.stage .fieldtype-radio input, .field-dynamictextgroup div.stage .fieldtype-checkbox input { position:relative; top:1px; }
-.field-dynamictextgroup div.stage .fieldtype-radio label,
-.field-dynamictextgroup div.stage .fieldtype-checkbox label {
+/* Radio Styling
+.field-dynamictextgroup div.duplicator .fieldtype-radio input, .field-dynamictextgroup div.duplicator .fieldtype-checkbox input { position:relative; top:1px; }
+.field-dynamictextgroup div.duplicator .fieldtype-radio label,
+.field-dynamictextgroup div.duplicator .fieldtype-checkbox label {
 	margin:0;
 	padding: 5px 4px 5px 4px !important;
 	border:1px solid transparent;
@@ -164,3 +255,4 @@
 	border-radius: 2px;
 	background:none;
 	}
+*/
