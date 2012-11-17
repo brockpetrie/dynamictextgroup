@@ -1,8 +1,8 @@
 # Dynamic Text Group
 
--  Version: 3.0
+-  Version: 3.0 dev1
 -  Author: [Brock Petrie](http://www.brockpetrie.com)
--  Build Date: 2012-10-28
+-  Build Date: 2012-11-16
 -  Requirements: Symphony 2.3
 
 ## Description
@@ -22,9 +22,9 @@ The Field Editor allows for easy manipulation and customization of each field's 
 
 **Version 3.0 dev1**
 
--  Official release.
+-  Started work on Symphony 2.3 compatibility.
 
-**Version 2.0 ** 
+**Version 2.0** 
 
 -  See [v2.0](https://github.com/brockpetrie/dynamictextgroup/tree/v2.0)
 
