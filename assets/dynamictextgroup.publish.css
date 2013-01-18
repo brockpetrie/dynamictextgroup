@@ -4,9 +4,9 @@
  * *	@source: http://github.com/brockpetrie/dynamictextgroup
  * */
 	
-.field-dynamictextgroup div.duplicator ul.selection li { padding-right: 0; }
+.field-dynamictextgroup div.frame ul.selection li { padding-right: 0; }
 
-.field-dynamictextgroup div.duplicator span {
+.field-dynamictextgroup div.frame span {
 	padding: 3px 42px 4px 16px;
 	margin: 0;
 	display: block;
@@ -16,25 +16,39 @@
 	-moz-box-sizing: border-box;
 	line-height: 1em;
 	}
-
+	
+.field-dynamictextgroup .frame > ol {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.12) !important;
+	}
+	.field-dynamictextgroup .frame > ol > li {
+		border-color: #bbb;
+		}
+		.field-dynamictextgroup .frame > ol > li:first-of-type { border-top: 1px solid #bbb; }
+		.field-dynamictextgroup .frame.single > ol > li:nth-last-of-type(-n+2) {
+			border-bottom: 1px solid #bbb;
+			border-bottom-left-radius: 4px;
+			border-bottom-right-radius: 4px;
+			}
+	
 .field-dynamictextgroup ol > li header {
-	padding-right: 60px;
 	padding: 7px 60px 7px 14px;
 	background: rgba(245,245,245,0);
 	}
-	.frame.orderable.multiple > ol > li header { cursor: pointer; }
+	
+	.field-dynamictextgroup .frame.single ol > li header { padding: 7px; }
+	.field-dynamictextgroup .frame > ol > li header { cursor: pointer; }
 	.field-dynamictextgroup ol > li header.focus {
 		padding-right: 60px;
 		padding: 7px 60px 7px 14px;
 		background: rgba(0,0,0,0.04);
 		}
 
-.field-dynamictextgroup div.duplicator span.fields {
+.field-dynamictextgroup div.frame span.fields {
 	background:none !important;
 	padding: 0px;
 	width: 100%;
 	}
-.field-dynamictextgroup div.duplicator span.fieldHolder {
+.field-dynamictextgroup div.frame span.fieldHolder {
 	background:none !important;
 	padding: 0 3px 0 0;
 	width: 50%;
@@ -42,11 +56,11 @@
 	float: left;
 	}
 
-.field-dynamictextgroup div.duplicator div.clear {
+.field-dynamictextgroup div.frame div.clear {
 	clear:both;
 	}
 
-.field-dynamictextgroup div.duplicator span.fields em.label {
+.field-dynamictextgroup div.frame span.fields em.label {
 	color: #BBB;
 	position: absolute;
 	top:0;
@@ -55,11 +69,11 @@
 	}
 	label > i > span.req { color:#d43; }
 	.invalid label > i > span.req { color:#fff; }
-.field-dynamictextgroup div.duplicator span.fields em.end.label {
+.field-dynamictextgroup div.frame span.fields em.end.label {
 	top: 28px;
 	}
 
-.field-dynamictextgroup div.duplicator .destructor {
+.field-dynamictextgroup div.frame .destructor {
 	top: 10px;
 	}
 
@@ -99,6 +113,8 @@
 .select2-container > a {
 	width: 100%;
 	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
 	margin: 0 !important;
 	height: 24px !important;
 	box-shadow: 0 2px 2px rgba(0,0,0,0.05);
@@ -108,10 +124,12 @@
 		border: 1px solid rgba(0,0,0,0.25) !important;
 		box-shadow: none !important;
 		}
-	.field-dynamictextgroup div.duplicator .select2-container > a span {
+	.field-dynamictextgroup div.frame .select2-container > a span {
 		padding: 5px 5px 5px 2px;
 		height: 100%;
 		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
 		color: #666;
 		background: url(images/select-arrows.png) right center no-repeat;
 		}
@@ -120,9 +138,8 @@
 	border: none;
 	display: none !important;
 	}
-.select2-container > a abbr {
-	top: 5px;
-	}
+.select2-container > a abbr { top: 4px !important; right: 20px !important; opacity: 0.5 !important; }
+.req .select2-container > a abbr { display: none !important; }
 .select2-container > a div b {
 	background: url(images/select-arrows.png) no-repeat 5px 6px;
 	opacity: 0.75;
@@ -137,43 +154,24 @@
 ul.select2-results > li.placeholder {
 	display: none !important;
 	}
+.select2-choice > span { color: #444 !important; }
+.select2-choice.select2-default > span { color: #aaa !important; }
 
 
+/*	*	*	Bad/invalid item styling	*	*	*/
+		
+.field-dynamictextgroup .invalid input[type="text"]:focus { border: 1px solid rgba(0, 0, 0, 0.4); }
+.field-dynamictextgroup .invalid input[type="text"] { border: 1px solid rgba(0, 0, 0, 0.25); }
 
-/*	*	*	Focus Styling	*	*	
-.field-dynamictextgroup div.duplicator span.fields.focus input,
-.field-dynamictextgroup div.duplicator span.fields.focus .customStyleSelectBox {
-	box-shadow: 0 0 5px #a7a7a7 !important;
-	-webkit-box-shadow: 0 0 5px #a7a7a7 !important;
-	-moz-box-shadow: 0 0 5px #a7a7a7 !important;
+.field-dynamictextgroup .invalid .dtg .req input[value=""],
+.field-dynamictextgroup .invalid .dtg .req.empty .customStyleSelectBox,
+.field-dynamictextgroup .invalid .dtg .baditem input[type="text"],
+.field-dynamictextgroup .invalid .dtg .baditem label {
+	border: 1px solid #cc3311 !important;
 	}
-.field-dynamictextgroup div.duplicator span.fields input:focus { outline: none; }
-*/
+	
+.field-dynamictextgroup .invalid .dtg .req .select2-choice.select2-default > span { color: #eb6347 !important; }
 
-
-/*	*	*	Bad/invalid item styling	*	*	
-.field-dynamictextgroup div.invalid {
-	padding: 0.75em 1em 0.75em;
-	background-color: #D42;
-	border: 1px solid #C31;
-	border-top-width: 0;
-	border-bottom-color: #B21;margin-top: 1.5em;
-	}
-	.field-dynamictextgroup div.invalid label { border:none; margin-top:1px; margin-bottom:1.5em; }
-	.field-dynamictextgroup div.invalid label i { top:0; right:0; }
-	.field-dynamictextgroup div.invalid .stage { margin-bottom:0.75em; }
-	.field-dynamictextgroup div.invalid p {
-		margin: 0;
-		padding: 0;
-		background: none;
-		border: none;
-		}
-.field-dynamictextgroup .invalid .req input[value=""],
-.field-dynamictextgroup .invalid .req.empty .customStyleSelectBox,
-.field-dynamictextgroup .invalid .baditem input[type="text"],
-.field-dynamictextgroup .invalid .baditem label {
-	border: 1px solid #d42 !important;
-	}
 .field-dynamictextgroup .invalid .new .req input[value=""] {
 	border: 1px solid #C2C2C2 !important;
 	}
@@ -181,65 +179,7 @@ ul.select2-results > li.placeholder {
 	border: 1px solid #C2C2C2 !important;
 	border-bottom-color:#bbb !important;
 	}
-*/
-
-
-/*	*	*	Textfield styling	*	*	
-.field-dynamictextgroup div.duplicator span.fields input[type="text"] {
-	width: 100%;
-	font-size: 109.09%;
-	border: 1px solid #C2C2C2;
-	background: #fff !important;
-	padding: 4px 5px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	-webkit-box-shadow: inset 1px 1px 1px #eee, 0 1px 0 rgba(255,255,255,0.35);
-	-moz-box-shadow: inset 1px 1px 1px #eee, 0 1px 0 rgba(255,255,255,0.35);
-	box-shadow: inset 1px 1px 1px #eee, 0 1px 0 rgba(255,255,255,0.35);
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	border-radius: 2px;
-	float: left;
-	}
-*/
-
-
-/*	*	*	Select list styling	*	*	*/
-/*.field-dynamictextgroup div.duplicator span.fields select {
-	position:relative;
-	top:3px;
-	font-size: 109.09%;
-	}
-	span.customStyleSelectBox {
-		font-size: 109.09%;
-		border: 1px solid #C2C2C2;
-		border-bottom-color:#bbb;
-		padding: 5px 5px 6px 5px !important;
-		line-height:1em;
-		-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-		box-sizing: border-box;
-		-webkit-border-radius: 2px;
-		-moz-border-radius: 2px;
-		border-radius: 2px;
-		float: left;
-		background: #ffffff;
-		background: -moz-linear-gradient(top, #ffffff 0%, #eee 100%);
-		background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#eee));
-		background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);
-		background: -o-linear-gradient(top, #ffffff 0%,#eee 100%);
-		background: -ms-linear-gradient(top, #ffffff 0%,#eee 100%);
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eeeeee',GradientType=0 );
-		background: linear-gradient(top, #ffffff 0%,#eee 100%);
-		}
-	span.customStyleSelectBox span, span.customStyleSelectBox span:hover {
-		background:url(images/select-arrows.png) no-repeat center right !important;
-		padding:0 !important;
-		}
-	span.customStyleSelectBoxInner { background:url(images/select-arrows.png) no-repeat center right !important; }*/
-
-
+	
 
 /* Radio Styling
 .field-dynamictextgroup div.duplicator .fieldtype-radio input, .field-dynamictextgroup div.duplicator .fieldtype-checkbox input { position:relative; top:1px; }

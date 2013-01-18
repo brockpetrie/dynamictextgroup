@@ -45,7 +45,7 @@
 			$reqLabelAppendage = $required ? ' <span class="req">*</span>' : '';
 			$reqclas .= $required ? ' req' : '';
 			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
-			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl .'<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" value="'. $textvalue .'" placeholder="'. $label .'" class="field-'. $handle .'" /></span>';
+			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl .'<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" value=\''. $textvalue .'\' placeholder="'. $label .'" class="field-'. $handle .'" /></span>';
 		}
 		
 		private static function __createSelectField($element, $handle, $val, $label=NULL, $width=NULL, $options=NULL) {
@@ -53,21 +53,35 @@
 			$reqLabelAppendage = $options->required ? ' <span class="req">*</span>' : '';
 			$reqclas .= $options->required ? ' req' : '';
 			if ($val == NULL)  $class .= ' empty';
-			$fSelectItems = explode(',', $options->selectItems);
+			
 			$width = 'style="width:'. $width .'% !important;"';
 			$select = '<span class="fieldHolder '. $handle .'-holder'. $reqclas .'" '. $width .'>';
 			$select .= '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
-			$select .= '<select id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" data-placeholder="'. $label .'" class="styled field-'. $handle .'">';
-			//$select .= '<option value="" class="placeholder">'. $label .'</option>';
-			$select .= '<option></option>';
-			//$select .= '<optgroup label="'. $label .'">';
-			$select .= '<optgroup label="Select one:">';
-			foreach ($fSelectItems as &$item) {
-				$item = trim($item);
-				$selected = $val == $item ? 'selected="selected"' : '';
-				$select .= '<option '. $selected .'>'. $item .'</option>';
+			
+			if ($options->customSelect != '') {
+				$populatevalue = $val == '' ? '' : "value='". $val ."'";
+				$select .= '<input type="hidden" id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" class="'. $options->customSelect .' field-'. $handle .'" '.$populatevalue.' />';
+			} else {
+				$items = '';
+				if (is_string($options->selectItems)) {
+					$items = explode(',', $options->selectItems);
+					$obj = '';
+					foreach ($items as $item) {
+						$obj[] = (object) array('id' => trim($item), 'text' => trim($item));
+					}
+					$items = $obj;
+				}
+				$select .= '<select id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" data-placeholder="'. $label .'" class="styled field-'. $handle .'">';
+				$select .= '<option></option>';
+				$select .= '<optgroup label="Select one:">';
+				foreach ($items as &$item) {
+					$selected = $val == $item->id ? 'selected="selected"' : '';
+					$select .= '<option value="'. $item->id .'" '. $selected .'>'. $item->text .'</option>';
+				}
+				$select .= '</optgroup></select>';
 			}
-			$select .= '</optgroup></select></span>';
+			
+			$select .= '</span>';
 			return $select;
 		}
 		

@@ -69,6 +69,9 @@
 				field.options.type = $('#fieldType', $(this)).val();
 				//if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
 				if (field.options.type == 'select') {
+					var str = $('#customSelect', $(this)).val();
+					field.options.customSelect = str;
+					//alert(field.options.customSelect);
 					var str = $('#selectItems', $(this)).val();
 					if (str.match("^\\[") && str.match("\\]$")) {
 						field.options.selectItems = JSON.parse(str);
@@ -122,6 +125,7 @@
 					fOpts.required = false;
 					fOpts.type = 'text';
 					fOpts.selectItems = '';
+					fOpts.customSelect = '';
 				}
 				
 				var boxy = $('<div></div>').attr('id', 'box'+(dtgEditor.boxOrder.length+1)).addClass('box'+newclass).html('<div class="inner"><div class="handle"></div></div>');
@@ -156,6 +160,9 @@
 				var selectItems = $('<input type="text" name="selectItems" id="selectItems" value="" placeholder="e.g. Option 1, Option 2, Option 3" />');
 				var selectItemsLabel = $('<label for="selectItems">List Values<br /></label>').append(selectItems).append('<em>Comma-separated values or JS object</em>');
 				
+				var customSelect = $('<input type="text" name="customSelect" id="customSelect" value="" />');
+				var customSelectLabel = $('<label for="customSelect"><br />Custom Override<br /></label>').append(customSelect).append('<em>Advanced users only, see the readme</em>');
+				
 				// Validation rule
 				var validationRule = $('<input type="text" name="validationRule" id="validationRule" value="" placeholder="Enter a regex pattern" />');
 				var validationRuleLabel = $('<label for="validationRule">Validation Rule<br /></label>').append(validationRule).append('<br />');
@@ -171,7 +178,7 @@
 				
 				// Append field type options
 				var fieldTypeHolder = $('<li></li>').append(fieldTypeLabel).appendTo($(options));
-				var selectItemsHolder = $('<li></li>').append(selectItemsLabel).appendTo($(options)).hide();
+				var selectItemsHolder = $('<li></li>').append(selectItemsLabel).append(customSelectLabel).appendTo($(options)).hide();
 				var validationRuleHolder = $('<li></li>').append(validationRuleLabel).appendTo($(options)).hide();
 				var requiredBoxHolder = $('<li></li>').append(requiredBoxLabel).appendTo($(options));
 				
@@ -179,8 +186,9 @@
 				switch(fOpts.type) {
 					case 'select':
 						$(selectItemsHolder).show();
-						var items = JSON.stringify(fOpts.selectItems);
+						var items = fOpts.selectItems instanceof Object ? JSON.stringify(fOpts.selectItems) : fOpts.selectItems;
 						$(selectItems).val(items);
+						$(customSelect).val(fOpts.customSelect);
 						break;
 					case 'text':
 						$(validationRuleHolder).show();
@@ -189,6 +197,7 @@
 				}
 				
 				$(selectItems).change(function() { dtgEditor.buildSchema(); });
+				$(customSelect).change(function() { dtgEditor.buildSchema(); });
 				$(validationRule).change(function() { dtgEditor.buildSchema(); });
 				
 				$(fieldType).change(function() {

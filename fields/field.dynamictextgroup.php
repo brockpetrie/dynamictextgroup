@@ -62,7 +62,7 @@
 				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 105, false);
 				
 				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
-				$tblocks .= '<span>'.$this->get('schema').'</span>';
+				//$tblocks .= '<span>'.$this->get('schema').'</span>';
 				$tblocks .= '<input type="hidden" id="addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
 				$tblocks .= '<input type="hidden" id="delfields" name="fields['.$this->get('sortorder').'][delfields]" value="" />';
 				$tblocks .= '<input type="hidden" id="renfields" name="fields['.$this->get('sortorder').'][renfields]" value="" />';
@@ -185,9 +185,10 @@
 	
 			// Append assets
 			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.min.js', 101, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 102, false);
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
+			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.custom.js', 102, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 103, false);
+			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 104, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 105, false);
 			
 			// Get settings
 			$settings = array('dark', 'frame');
@@ -378,7 +379,9 @@
 				foreach ($data as &$field) {
 					if (!empty($field[$i]) || $field[$i] == '0') {
 						$empty = false;	
-						$emptyEntry = false;	
+						$emptyEntry = false;
+						//$field[$i] = str_replace("\"", "&quot;", $field[$i]);
+						$field[$i] = str_replace("'", "&apos;", $field[$i]);
 					} else {
 						$field[$i] = ' ';
 					}
@@ -495,8 +498,19 @@
 				$item = new XMLElement('item');
 				$empty = true;
 				foreach ($schema as $field) {
-					$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
-					$item->appendChild(new XMLElement($field->handle, $val));
+					$node = new XMLElement($field->handle);
+					
+					// If field data is JSON, iterate through the keys and append each as its own node
+					$tryjson = json_decode($data[$field->handle][$i]);
+					if (!json_last_error() && strpos($data[$field->handle][$i],'{') !== false) {
+						foreach ($tryjson as $key => $obj) {
+							$node->appendChild(new XMLElement($key, $obj));
+						}
+					} else {
+						$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
+						$node->setValue($val);
+					}
+					$item->appendChild($node);				
 				}
 				$textgroup->appendChild($item);
 			}

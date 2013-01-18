@@ -24,8 +24,6 @@
 	width: 100%;
 	float: left;
 	}
-	/*.field-dynamictextgroup .box:first-of-type .inner { margin-left: 6px; }
-	.field-dynamictextgroup .box:last-of-type .inner { margin-right: 6px; }*/
 	
 	.field-dynamictextgroup .inner {
 		padding: 5px 25px 5px 15px;
@@ -142,7 +140,7 @@
 	padding-top:13px;
 	margin:0;
 	width:200px;
-	left: 50%;
+	right: 10px;
 	margin-left: -100px;
 	background:rgba(245,245,245,0.95);
 	color:#888;

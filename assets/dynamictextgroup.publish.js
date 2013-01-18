@@ -7,6 +7,51 @@
 	 * */
 	 
 	 
+	function customSelect(context) {
+		//	Example of a custom select box.
+		//	This example lets you search for and select movies from Rotten Tomatoes.
+		//	Read through the Select2 documentation to get started: http://ivaynberg.github.com/select2/
+		//
+		$('.rottentomatoes-example', $(context)).each(function() {
+			// Remove your class after instantiation to avoid conflicts
+			$(this).removeClass('rottentomatoes-example');
+			$(this).select2({
+				placeholder: "Search for a movie",
+				allowClear: true,
+				minimumInputLength: 3,
+				ajax: {
+					url: "http://api.rottentomatoes.com/api/public/v1.0/movies.json",
+					dataType: 'jsonp',
+					data: function (term, page) {
+						return {
+							q: term,
+							page_limit: 10,
+							apikey: "rze7s26thcbsw7stnfkgpynw"
+						};
+					},
+					results: function (data, page) {
+						return {results: data.movies};
+					}
+				},
+				id: function(movie) {
+					var obj = new Object();
+					obj.id = movie.links.alternate;
+					obj.title = movie.title.replace("'", '&apos;').replace('"', '&quot;');
+					obj.rating = movie.mpaa_rating;
+					return JSON.stringify(obj);
+				},
+				formatResult: function(movie) { return movie.title; },
+				formatSelection: function(movie) { return movie.title; },
+				initSelection: function(element, callback) {
+					if (element.val() != '') {
+						callback(JSON.parse(element.val()));
+					}
+				}
+			});
+		});
+	}
+	 
+	 
 	// DynamicTextGroup stuff
 	
 	DynamicTextGroup = {
@@ -49,24 +94,16 @@
 		}
 	}
 	
-		
-	// Stage stuff
+	
+	// Duplicator stuff
 	
 	$(document).ready(function() {
 		$('.dtg .styled').each(function() {
-			var sel = $(this);
-			
-			/*$('option.placeholder', this).attr('value', placeholder);*/
-			sel.select2({allowClear: true});
-			/*$('option.placeholder', this).attr('value', '');
-			sel.removeClass('styled');
-			
-			sel.on("change", function() {
-				if (sel.select2('val') == '') {
-					sel.select2('data', {id: '', text: placeholder});
-				}
-			});*/
+			$(this).select2({allowClear: true});
+			$(this).removeClass('styled');
 		});
+		customSelect('.dtg');
+		
 		DynamicTextGroup.parseBadItems();
 		DynamicTextGroup.constructed();
 		
@@ -96,11 +133,10 @@
 			
 			stage.on('constructshow.duplicator', 'li', function(event) {
 				$('.styled', this).each(function() {
-					$('option.placeholder', this).attr('value', $('option.placeholder', this).text());
 					$(this).select2({allowClear: true});
-					$('option.placeholder', this).attr('value', '');
 					$(this).removeClass('styled');
 				});
+				customSelect('.create');
 			});
 			
 			//$('.fields', manager).click(function() { event.stopPropagation(); });
