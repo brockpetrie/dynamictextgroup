@@ -28,7 +28,7 @@ v3.0 now uses Select2 as its select box mechanism. This means that dynamic value
 
 -  Symphony 2.3 compatibility.
 -  Switched Select Box mechanism to use [Select2](http://ivaynberg.github.com/select2/), so it's now Select Box on steroids. Dynamic select values and more!
--  Just a heads up: I'm planning on renaming this extension to *Dynamic Field Groups* at some point in the future, so 
+-  Just a heads up: I'm planning on renaming this extension to *Dynamic Field Groups* at some point in the future, so brace yourselves.
 
 **Version 2.0** 
 
