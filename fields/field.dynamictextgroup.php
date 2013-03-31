@@ -185,10 +185,9 @@
 	
 			// Append assets
 			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.min.js', 101, false);
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.custom.js', 102, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 103, false);
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 104, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 105, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 102, false);
+			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
+			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
 			
 			// Get settings
 			$settings = array('dark', 'frame');
