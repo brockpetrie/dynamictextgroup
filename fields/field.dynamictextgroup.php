@@ -481,7 +481,7 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#appendFormattedElement * * */
-		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id) {
+		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id = null) {
 			// Get field properties and decode schema
 			$fieldCount = $this->get('fieldcount');
 			$schema = json_decode($this->get('schema'));
