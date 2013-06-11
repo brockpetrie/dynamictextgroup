@@ -150,6 +150,7 @@
 				// Field Type select
 				var fieldType = $('<select id="fieldType" name="fieldType"></select>')
 					.append('<option value="text">Textfield</option>')
+					.append('<option value="multilingual">Multilingual</option>')
 					.append('<option value="select">Select List</option>')
 					.append('<option value="checkbox">Checkbox</option>')
 					.append('<option value="radio">Radio Button</option>');
@@ -208,6 +209,9 @@
 					switch($(this).val()) {
 					case 'select':
 						$(selectItemsHolder).slideDown(250);
+						break;
+					case 'multilingual':
+						$(validationRuleHolder).slideDown(250);
 						break;
 					case 'text':
 						$(validationRuleHolder).slideDown(250);

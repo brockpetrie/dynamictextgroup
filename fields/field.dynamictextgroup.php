@@ -157,6 +157,20 @@
 		}
 		
 		function __alterTable($mode, $col, $rename=NULL) {
+			$type = null;
+			foreach(json_decode($this->get('schema')) as $field) {
+			    if ($col == strtolower($field->label)) {
+			        $type = $field->options->type;
+			        break;
+			    }
+			}
+
+			if ($type == 'multilingual'){
+				foreach (FLang::getLangs() as $lang){
+					$return = $this->__alterTable($mode,$col.'-'.$lang,$rename);
+				}
+				return;
+			}
 			// Function $mode options:
 			// 0 = Delete column; 	e.g.  __alterTable(0, 'badcolumn');
 			// 1 = Add column; 		e.g.  __alterTable(1, 'newcolumn');
@@ -220,7 +234,15 @@
 				
 				for($i=0; $i<$entryCount; $i++) {
 					foreach ($schema as $field) {
-						$entryValues[$i][] = $data[$field->handle][$i];
+						if ($field->options->type == 'multilingual'){
+							$values = array();
+							foreach (FLang::getLangs() as $lang) {
+								$values[$lang] = $data[$field->handle.'-'.$lang][$i];
+							}
+							$entryValues[$i][] = $values;
+						} else {
+							$entryValues[$i][] = $data[$field->handle][$i];
+						}
 					}
 					$list->appendChild(
 						Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], 'dtg', $schema)
@@ -281,6 +303,20 @@
 					
 					switch ($field->options->type) {
 						case 'text':
+							// Check if field passes any rules
+							$rule = $field->options->validationRule != '' ? $field->options->validationRule : false;
+							if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
+								$badValidate[] = array('handle' => $field->handle.'-holder', 'index' => $i);
+							}
+							// Check if required subfield is empty
+							if ($req && $data[$field->handle][$i] == '') {
+								$emptyReq = true;
+							} else if ($data[$field->handle][$i] != '') {
+								$empty = false;
+								$emptyRow = false;
+							}
+							break;
+						case 'multilanguage':
 							// Check if field passes any rules
 							$rule = $field->options->validationRule != '' ? $field->options->validationRule : false;
 							if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
@@ -505,6 +541,10 @@
 						foreach ($tryjson as $key => $obj) {
 							$node->appendChild(new XMLElement($key, $obj));
 						}
+					} else if ($field->options->type == 'multilingual'){
+						$lang = FLang::getLang();
+						$val = $data[$field->handle . '-' . $lang][$i] != ' ' ? General::sanitize($data[$field->handle . '-' . $lang][$i]) : '';
+						$node->setValue($val);
 					} else {
 						$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
 						$node->setValue($val);

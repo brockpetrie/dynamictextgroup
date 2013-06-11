@@ -17,6 +17,9 @@
 					case 'text':
 						$fields .= self::__createTextField($element, $schema[$i]->handle, $fieldVal, $schema[$i]->label, $schema[$i]->width, $schema[$i]->options->required);
 						break;
+					case 'multilingual':
+						$fields .= self::__createMultilingualTextField($element, $schema[$i]->handle, $fieldVal, $schema[$i]->label, $schema[$i]->width, $schema[$i]->options->required);
+						break;
 					case 'select':
 						$fields .= self::__createSelectField($element, $schema[$i]->handle, $fieldVal, $schema[$i]->label, $schema[$i]->width, $schema[$i]->options);
 						break;
@@ -46,6 +49,19 @@
 			$reqclas .= $required ? ' req' : '';
 			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
 			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl .'<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" value=\''. $textvalue .'\' placeholder="'. $label .'" class="field-'. $handle .'" /></span>';
+		}
+
+		private static function __createMultilingualTextField($element, $handle, $value, $label=NULL, $width=NULL, $required=NULL) {
+			// Generate text field
+			$width = 'style="width:'. $width .'% !important;"';
+			$reqLabelAppendage = $required ? ' <span class="req">*</span>' : '';
+			$reqclas .= $required ? ' req' : '';
+			$input = '';
+			foreach (FLang::getLangs() as $lang) {
+				$input.='<input type="text" id="field-'. $handle . '-' . $lang .'" name="fields['. $element .']['. $handle . '-' . $lang . '][]" value=\''. trim($value[$lang]) .'\' placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle .'" />';
+			}
+			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
+			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl . $input . '</span>';
 		}
 		
 		private static function __createSelectField($element, $handle, $val, $label=NULL, $width=NULL, $options=NULL) {
