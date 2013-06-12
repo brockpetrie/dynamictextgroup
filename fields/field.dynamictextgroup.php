@@ -7,7 +7,7 @@
 
 	require_once(EXTENSIONS . '/dynamictextgroup/lib/class.textgroup.php');
 
-	Class fielddynamictextgroup extends Field {
+	Class fielddynamictextgroup extends Field implements ImportableField{
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#__construct * * */
 		function __construct() {	
@@ -393,6 +393,56 @@
 			return self::__OK__;
 		}
 		
+
+		public function prepareImportValue($data, $entry_id = null){
+			$schema = json_decode($this->get('schema'));
+
+			$xml = simplexml_load_string($data[0]);
+
+			$result = array();
+			foreach ($schema as $field) {
+				$handle = $field->handle;
+				if ($field->options->type=='multilingual'){
+					if (!class_exists(FLang)){
+						$flExt = ExtensionManager::create('frontend_localisation');
+					}
+					$langs = FLang::getLangs();
+					//initialize frontend localisation as not initiated
+					if (empty($langs)){
+						$flExt = ExtensionManager::create('frontend_localisation');
+						$flExt->dFrontendInitialised();
+						$langs = FLang::getLangs();
+					}
+					foreach( $langs as $lang ){
+						$result[$handle.'-'.$lang] = array();
+					}
+				} else {
+					$result[$handle] = array();
+				}
+			}
+
+			// var_dump($schema);
+
+			foreach ($xml->xpath('item') as $item) {
+				foreach ($schema as $field) {
+					$handle = $field->handle;
+					if ($field->options->type=='multilingual'){
+						foreach( $langs as $lang ){
+							$langHandle = $handle.'-'.$lang;
+							// var_dump($item->$langHandle);
+							$result[$langHandle][] = (string)$item->$langHandle;
+						}
+					} else {
+						// var_dump($item->$handle);
+						$result[$handle][] = (string)$item->$handle;
+					}
+				}
+			}
+			// var_dump($result);die;
+			
+			return $result;
+		}
+
 		
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#processRawFieldData * * */
 		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL) {
