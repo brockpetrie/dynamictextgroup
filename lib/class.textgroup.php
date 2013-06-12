@@ -58,10 +58,10 @@
 			$reqclas .= $required ? ' req' : '';
 			$input = '';
 			foreach (FLang::getLangs() as $lang) {
-				$input.='<input type="text" id="field-'. $handle . '-' . $lang .'" name="fields['. $element .']['. $handle . '-' . $lang . '][]" value=\''. trim($value[$lang]) .'\' placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle .'" />';
+				$input.='<input type="text" id="field-'. $handle . '-' . $lang .'" name="fields['. $element .']['. $handle . '-' . $lang . '][]" value=\''. trim($value[$lang]) .'\' placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" />';
 			}
 			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
-			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl . $input . '</span>';
+			return '<span class="fieldHolder multilingual '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl . $input . '</span>';
 		}
 		
 		private static function __createSelectField($element, $handle, $val, $label=NULL, $width=NULL, $options=NULL) {

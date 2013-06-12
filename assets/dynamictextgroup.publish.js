@@ -103,6 +103,11 @@
 			$(this).removeClass('styled');
 		});
 		customSelect('.dtg');
+
+		$('.field-multilingual').on('click', 'li', function(){
+			var lang_code = $(this).data('lang_code');
+			$('.field-dynamictextgroup .fieldHolder.multilingual input').hide().filter('.'+lang_code).show();
+		});
 		
 		DynamicTextGroup.parseBadItems();
 		DynamicTextGroup.constructed();
