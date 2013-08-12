@@ -233,6 +233,8 @@
 					// clear options
 					$(validationRuleHolder).slideUp(250);
 					$(selectItemsHolder).slideUp(250);
+					$(fieldFormatterHolder).slideUp(250);
+					$(multilineBoxHolder).slideUp(250);
 					// show appropriate options
 					switch($(this).val()) {
 					case 'select':
