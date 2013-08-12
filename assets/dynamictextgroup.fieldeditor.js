@@ -66,6 +66,8 @@
 				field.width = Math.round(dtgEditor.parseWidth($(this).innerWidth())*10)/10;
 				field.options = {};
 				field.options.required = $('input[name="required"]', $(this)).attr('checked');
+				field.options.multiline = $('input[name="multiline"]', $(this)).attr('checked');
+				field.options.formatter = $('select[name="fieldFormatter"]', $(this)).val();
 				field.options.type = $('#fieldType', $(this)).val();
 				//if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
 				if (field.options.type == 'select') {
@@ -171,16 +173,36 @@
 				$('<a href="#" class="valOption">email</a>').click(function(){ $(validationRule).val('/^\\w(?:\\.?[\\w%+-]+)*@\\w(?:[\\w-]*\\.)+?[a-z]{2,}$/i'); dtgEditor.buildSchema(); return false; }).appendTo(validationRuleLabel);
 				$('<a href="#" class="valOption">URI</a>').click(function(){ $(validationRule).val('/^[^\\s:\\/?#]+:(?:\\/{2,3})?[^\\s.\\/?#]+(?:\\.[^\\s.\\/?#]+)*(?:\\/[^\\s?#]*\\??[^\\s?#]*(#[^\\s#]*)?)?$/'); dtgEditor.buildSchema(); return false; }).appendTo(validationRuleLabel);
 				
+				// Formatter 
+				var fieldFormatter = $('<select id="fieldFormatter" name="fieldFormatter"></select>')
+					.append('<option value="none">None</option>');
+				//append real formatters added in SymphonyVar
+				$.each(Symphony.textFormatters,function(index,value){
+					fieldFormatter.append('<option value="'+index+'">'+value+'</option>');
+				});
+
+				$(fieldFormatter).val(fOpts.formatter);
+				var fieldFormatterLabel = $('<label for="fieldFormatter">Field Formatter<br /></label>').append(fieldFormatter);
+
 				// Required checkbox
 				var requiredBox = $('<input type="checkbox" name="required" />');
 				if (fOpts.required) $(requiredBox).attr('checked','checked');
 				$(requiredBox).change(function() { dtgEditor.buildSchema(); });
 				var requiredBoxLabel = $('<label></label>').append(requiredBox).append('Required');
+
+				// Row Count Holder
+				console.log(fOpts);
+				var multilineBox = $('<input type="checkbox" name="multiline" />');
+				if (fOpts.multiline) $(multilineBox).attr('checked','checked');
+				$(multilineBox).change(function() { dtgEditor.buildSchema(); });
+				var multilineBoxLabel = $('<label></label>').append(multilineBox).append('Multiline');
 				
 				// Append field type options
 				var fieldTypeHolder = $('<li></li>').append(fieldTypeLabel).appendTo($(options));
 				var selectItemsHolder = $('<li></li>').append(selectItemsLabel).append(customSelectLabel).appendTo($(options)).hide();
 				var validationRuleHolder = $('<li></li>').append(validationRuleLabel).appendTo($(options)).hide();
+				var fieldFormatterHolder = $('<li></li>').append(fieldFormatterLabel).appendTo($(options)).hide();
+				var multilineBoxHolder = $('<li></li>').append(multilineBoxLabel).appendTo($(options)).hide();
 				var requiredBoxHolder = $('<li></li>').append(requiredBoxLabel).appendTo($(options));
 				
 				// Find current field type and show appropriate options
@@ -194,6 +216,12 @@
 					case 'text':
 						$(validationRuleHolder).show();
 						$(validationRule).val(fOpts.validationRule);
+						break;
+					case 'multilingual':
+						$(validationRuleHolder).show();
+						$(validationRule).val(fOpts.validationRule);
+						$(fieldFormatterHolder).show();
+						$(multilineBoxHolder).show();
 						break;
 				}
 				
@@ -212,6 +240,7 @@
 						break;
 					case 'multilingual':
 						$(validationRuleHolder).slideDown(250);
+						$(multilineBoxHolder).slideDown(250);
 						break;
 					case 'text':
 						$(validationRuleHolder).slideDown(250);

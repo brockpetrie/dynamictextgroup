@@ -61,6 +61,20 @@
 				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 104, false);
 				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 105, false);
 				
+
+				$textFormatterScriptCode = "Symphony.textFormatters = {";
+				$textFormatters = TextformatterManager::listAll();
+				foreach ($textFormatters as $key => $textFormatter) {
+					$textFormatterScriptCode.="'{$key}' : '{$textFormatter['name']}',";
+				}
+				$textFormatterScriptCode = trim($textFormatterScriptCode, ",");
+				$textFormatterScriptCode.='}';
+
+				$textFormatterScript = new XMLElement('script',$textFormatterScriptCode,array('type'=>'text/javascript'));
+
+				Administration::instance()->Page->addElementToHead($textFormatterScript, 106, false);
+
+				
 				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
 				//$tblocks .= '<span>'.$this->get('schema').'</span>';
 				$tblocks .= '<input type="hidden" id="addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
@@ -156,21 +170,41 @@
 			
 		}
 		
-		function __alterTable($mode, $col, $rename=NULL) {
+		function __alterTable($mode, $col, $rename=NULL, $multiline = null, $formatter = null,$oldFieldSchema=null) {
 			$type = null;
+			if (!isset($oldSchema)){
+				$id = $this->get('id');
+				$oldSchema = json_decode(Symphony::Database()->fetchVar("schema",0,"SELECT `schema` FROM `tbl_fields_" . $this->handle() . "` WHERE `field_id` = '$id' LIMIT 1"));	
+			
+				foreach($oldSchema as $field) {
+				    if ($rename == strtolower($field->label) || $col == strtolower($field->label)) {
+				        $oldFieldSchema = $field;
+				        break;
+				    }
+				}
+			}
+
 			foreach(json_decode($this->get('schema')) as $field) {
-			    if ($col == strtolower($field->label)) {
+			    if ($rename == strtolower($field->label) || $col == strtolower($field->label)) {
 			        $type = $field->options->type;
+			        $multiline = $field->options->multiline;
+			        $formatter = $field->options->formatter;
 			        break;
 			    }
 			}
 
 			if ($type == 'multilingual'){
 				foreach (FLang::getLangs() as $lang){
-					$return = $this->__alterTable($mode,$col.'-'.$lang,$rename);
+					$return = $this->__alterTable($mode,$col.'-'.$lang,$rename.'-'.$lang, $multiline, $formatter,$oldFieldSchema);
 				}
 				return;
 			}
+
+			$fieldtype = 'varchar(255) null';
+			if (isset($multiline)){
+				$fieldtype = 'TEXT default NULL';
+			}
+
 			// Function $mode options:
 			// 0 = Delete column; 	e.g.  __alterTable(0, 'badcolumn');
 			// 1 = Add column; 		e.g.  __alterTable(1, 'newcolumn');
@@ -179,14 +213,32 @@
 				case 0:
 					// Delete column
 					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` DROP COLUMN `". $col ."`");
+					if (isset($oldFieldSchema->options->formatter) && $oldFieldSchema->options->formatter !='none'){
+						//had a formatter so remove coloumn
+						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` DROP COLUMN `". $col ."-formatted`");
+					}
 					break;
 				case 1:
 					// Add column
-					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` ADD COLUMN `". $col ."` varchar(255) null");
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` ADD COLUMN `". $col ."` ".$fieldtype);
+					if (isset($formatter) && $formatter != 'none'){
+						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` ADD COLUMN `". $col ."-formatted` ".$fieldtype);
+					}
 					break;
 				case 2:
 					// Rename column
-					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` CHANGE `". $col ."` `". $rename ."` varchar(255) null");
+					Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` CHANGE `". $col ."` `". $rename ."` ".$fieldtype);
+					if (isset($formatter) && $formatter != 'none' && isset($oldFieldSchema->options->formatter) && $oldFieldSchema->options->formatter !='none'){
+						//has a formatter and was previously set so alter coloumn name
+						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` CHANGE `". $col ."-formatted` `". $rename ."-formatted` ".$fieldtype);
+					} else if (isset($formatter) && $formatter != 'none'){
+						//has a formatter (not previously) so add coloumn
+						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` ADD COLUMN `". $col ."-formatted` ".$fieldtype);
+					}
+					else if (isset($oldFieldSchema->options->formatter) && $oldFieldSchema->options->formatter !='none'){
+						//had a formatter before (not anymore) so remove previous coloumn
+						Symphony::Database()->query("ALTER TABLE `tbl_entries_data_" . $this->get('id') . "` DROP COLUMN `". $rename ."-formatted`");
+					}
 					break;
 				default:
 					return false;
@@ -322,6 +374,8 @@
 							if ($rule && !General::validateString($data[$field->handle][$i], $rule)){
 								$badValidate[] = array('handle' => $field->handle.'-holder', 'index' => $i);
 							}
+							//If textarea formatter should be here
+
 							// Check if required subfield is empty
 							if ($req && $data[$field->handle][$i] == '') {
 								$emptyReq = true;
@@ -443,6 +497,17 @@
 			return $result;
 		}
 
+		public function applyFormatting($data,$textFormatter='none') {
+			if (isset($textFormatter) && $textFormatter != 'none') {
+				$formatter = TextformatterManager::create($textFormatter);
+				$formatted = $formatter->run($data);
+			 	$formatted = preg_replace('/&(?![a-z]{0,4}\w{2,3};|#[x0-9a-f]{2,6};)/i', '&amp;', $formatted);
+
+			 	return trim($formatted);
+			}
+
+			return General::sanitize($data);
+		}
 		
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#processRawFieldData * * */
 		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL) {
@@ -458,15 +523,30 @@
 			
 			// Check for empties
 			$empty = true;
+
+			$schema = json_decode($this->get('schema'));
+			$fields = $arrayName = array();
+			foreach ($schema as $key => $field) {
+				$fields[$field->handle] = $field;
+			}
+			// var_dump($fields);die;
+			// var_dump($data);die;
 			
 			for($i=0; $i < $entryCount; $i++) {
 				$emptyEntry = true;
-				foreach ($data as &$field) {
+				foreach ($data as $key => &$field) {
 					if (!empty($field[$i]) || $field[$i] == '0') {
 						$empty = false;	
 						$emptyEntry = false;
 						//$field[$i] = str_replace("\"", "&quot;", $field[$i]);
 						$field[$i] = str_replace("'", "&apos;", $field[$i]);
+						$formatter = $fields[$key]->options->formatter;
+						if(!isset($fields[$key]) && isset($fields[substr($key, 0, -3)])){
+							$formatter = $fields[substr($key, 0, -3)]->options->formatter;
+						}
+						if (isset($formatter) && $formatter!='none'){
+							$data[$key.'-formatted'][$i] = $this->applyFormatting($field[$i],$formatter);
+						}
 					} else {
 						$field[$i] = ' ';
 					}
@@ -593,7 +673,11 @@
 						}
 					} else if ($field->options->type == 'multilingual'){
 						$lang = FLang::getLang();
-						$val = $data[$field->handle . '-' . $lang][$i] != ' ' ? General::sanitize($data[$field->handle . '-' . $lang][$i]) : '';
+						$fieldHandle = $field->handle . '-' . $lang;
+						if (isset($field->options->formatter) && $field->options->formatter !='none'){
+							$fieldHandle.='-formatted';
+						}
+						$val = $data[$fieldHandle][$i] != ' ' ? $data[$fieldHandle][$i] : '';
 						$node->setValue($val);
 					} else {
 						$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
