@@ -240,6 +240,7 @@
 						break;
 					case 'multilingual':
 						$(validationRuleHolder).slideDown(250);
+						$(fieldFormatterHolder).slideDown(250);
 						$(multilineBoxHolder).slideDown(250);
 						break;
 					case 'text':
