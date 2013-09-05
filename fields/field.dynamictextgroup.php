@@ -5,6 +5,7 @@
 	
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 
+	require_once FACE . '/interface.importablefield.php';
 	require_once(EXTENSIONS . '/dynamictextgroup/lib/class.textgroup.php');
 
 	Class fielddynamictextgroup extends Field implements ImportableField{
