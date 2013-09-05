@@ -39,4 +39,70 @@
 			Symphony::Database()->query("DROP TABLE `tbl_fields_dynamictextgroup`");
 		}
 
+		/*------------------------------------------------------------------------------------------------*/
+		/*  Delegates  */
+		/*------------------------------------------------------------------------------------------------*/
+
+		public function getSubscribedDelegates(){
+			return array(
+				array(
+					'page' => '/extensions/frontend_localisation/',
+					'delegate' => 'FLSavePreferences',
+					'callback' => 'dFLSavePreferences'
+				),
+			);
+		}
+
+		/*------------------------------------------------------------------------------------------------*/
+		/*  System preferences  */
+		/*------------------------------------------------------------------------------------------------*/
+
+
+		/**
+		 * Save options from Preferences page
+		 *
+		 * @param array $context
+		 */
+		public function dFLSavePreferences($context){
+			$fieldTable = "tbl_fields_dynamictextgroup";
+			$fields = Symphony::Database()->fetch(sprintf('SELECT `field_id` FROM `%s`', $fieldTable));
+
+			if( $fields ){
+				// Foreach field check multilanguage values foreach language
+				foreach( $fields as $field ){
+					$entries_table = 'tbl_entries_data_'.$field["field_id"];
+
+					try{
+						$columns = Symphony::Database()->fetchCol('Field',"SHOW COLUMNS FROM `{$entries_table}`;");
+					}
+					catch( DatabaseException $dbe ){
+						// Field doesn't exist. Better remove it's settings
+						Symphony::Database()->query(sprintf(
+								"DELETE FROM `%s` WHERE `field_id` = %s;",
+								$fieldTable, $field["field_id"])
+						);
+						continue;
+					}
+
+					$fieldObject = FieldManager::fetch($field["field_id"]);
+					$schema = json_decode($fieldObject->get('schema'));
+					foreach ($schema as $key => $schemaField) {
+						if ($schemaField->options->type=='multilingual'){
+							// var_dump($schemaField->handle);die;
+
+
+							foreach( $context['new_langs'] as $lc ){
+								// If column lang_code dosen't exist in the laguange drop columns
+
+								if( !in_array($schemaField->handle . '-'.$lc, $columns) ){
+									$fieldObject->__alterTable(1, $schemaField->handle . '-' . $lc ,$schemaField->options->multiline, $schemaField->options->formatter,$schemaField);
+								}
+							}
+						}
+					}
+
+				}
+			}
+		}
+
 	}

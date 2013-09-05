@@ -177,11 +177,13 @@
 				$id = $this->get('id');
 				$oldSchema = json_decode(Symphony::Database()->fetchVar("schema",0,"SELECT `schema` FROM `tbl_fields_" . $this->handle() . "` WHERE `field_id` = '$id' LIMIT 1"));	
 			
-				foreach($oldSchema as $field) {
-				    if ($rename == strtolower($field->label) || $col == strtolower($field->label)) {
-				        $oldFieldSchema = $field;
-				        break;
-				    }
+				if (isset($oldSchema)){
+					foreach($oldSchema as $field) {
+					    if ($rename == strtolower($field->label) || $col == strtolower($field->label)) {
+					        $oldFieldSchema = $field;
+					        break;
+					    }
+					}
 				}
 			}
 
