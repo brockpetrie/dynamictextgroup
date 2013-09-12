@@ -552,6 +552,9 @@
 						}
 					} else {
 						$field[$i] = ' ';
+						if (isset($formatter) && $formatter!='none'){
+							$data[$key.'-formatted'][$i] =' ';
+						}
 					}
 				}
 				if ($emptyEntry) {
