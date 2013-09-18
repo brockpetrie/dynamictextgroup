@@ -106,7 +106,7 @@
 
 		$('.field-multilingual').on('click', 'li', function(){
 			var lang_code = $(this).data('lang_code');
-			$('.field-dynamictextgroup .fieldHolder.multilingual input').hide().filter('.'+lang_code).show();
+			$('.field-dynamictextgroup .fieldHolder.multilingual input,.field-dynamictextgroup .fieldHolder.multilingual textarea').hide().filter('.'+lang_code).show();
 		});
 		
 		DynamicTextGroup.parseBadItems();
@@ -142,6 +142,9 @@
 					$(this).removeClass('styled');
 				});
 				customSelect('.create');
+				var lang_code = $('.field-multilingual .tabs .active').eq(0).attr('class').substring(0,2);
+				console.log(lang_code);
+				$('.field-dynamictextgroup .fieldHolder.multilingual input,.field-dynamictextgroup .fieldHolder.multilingual textarea').hide().filter('.'+lang_code).show();
 			});
 			
 			//$('.fields', manager).click(function() { event.stopPropagation(); });
