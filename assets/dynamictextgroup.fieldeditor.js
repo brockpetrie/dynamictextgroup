@@ -354,25 +354,13 @@
 		},
 	}
 	
-	/*$('.dropdown').hide();
-
-	$(document).bind('click', function(e) {
-		var target = $( e.target );
-		if ( target.closest('#nav').length < 1 ) {
-			nav.find('ul.dropdown').hide();
-			return;
-		}
-		if ( target.parent().is('span') ) {
-			var li = target.closest('li.menu');
-			li.siblings().find('ul.dropdown').hide();
-			li.find('ul.dropdown').toggle();
-			e.preventDefault();
-		}
-	})*/
-	
-	
 	$(document).ready(function () {
 		dtgEditor.init();
 	});
+
+
+	// jQuery UI Resizeable plugin that allows for inverse sizing in the Field Editor (i.e. making one field larger makes its adjacent sibling smaller)
+	$.ui.plugin.add("resizable","alsoResizeReverse",{start:function(){var e=$(this).data("ui-resizable"),t=e.options,n=function(e){$(e).each(function(){var e=$(this);e.data("ui-resizable-alsoresize-reverse",{width:parseInt(e.width(),10),height:parseInt(e.height(),10),left:parseInt(e.css("left"),10),top:parseInt(e.css("top"),10)})})};if(typeof t.alsoResizeReverse==="object"&&!t.alsoResizeReverse.parentNode){if(t.alsoResizeReverse.length){t.alsoResizeReverse=t.alsoResizeReverse[0];n(t.alsoResizeReverse)}else{$.each(t.alsoResizeReverse,function(e){n(e)})}}else{n(t.alsoResizeReverse)}},resize:function(e,t){var n=$(this).data("ui-resizable"),r=n.options,i=n.originalSize,s=n.originalPosition,o={height:n.size.height-i.height||0,width:n.size.width-i.width||0,top:n.position.top-s.top||0,left:n.position.left-s.left||0},u=function(e,n){$(e).each(function(){var e=$(this),r=$(this).data("ui-resizable-alsoresize-reverse"),i={},s=n&&n.length?n:e.parents(t.originalElement[0]).length?["width","height"]:["width","height","top","left"];$.each(s,function(e,t){var n=(r[t]||0)-(o[t]||0);if(n&&n>=0){i[t]=n||null}});e.css(i)})};if(typeof r.alsoResizeReverse==="object"&&!r.alsoResizeReverse.nodeType){$.each(r.alsoResizeReverse,function(e,t){u(e,t)})}else{u(r.alsoResizeReverse)}},stop:function(){$(this).removeData("resizable-alsoresize-reverse")}})
+
 		
 })(jQuery.noConflict());

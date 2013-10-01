@@ -56,7 +56,7 @@
 		.tfield::after {
 			content: " ";
 			display: block;
-			widows: 20px;
+			width: 20px;
 			height: 20px;
 			background: #f00;
 			position: absolute;
