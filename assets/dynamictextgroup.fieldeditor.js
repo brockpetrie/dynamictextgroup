@@ -65,7 +65,7 @@
 				field.label = $('.tfield', $(this)).val();
 				field.width = Math.round(dtgEditor.parseWidth($(this).innerWidth())*10)/10;
 				field.options = {};
-				field.options.required = $('input[name="required"]', $(this)).attr('checked');
+				field.options.required = $('input[name="required"]', $(this)).is(':checked');
 				field.options.type = $('#fieldType', $(this)).val();
 				//if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
 				if (field.options.type == 'select') {
