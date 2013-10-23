@@ -680,10 +680,14 @@
 					} else if ($field->options->type == 'multilingual'){
 						$lang = FLang::getLang();
 						$fieldHandle = $field->handle . '-' . $lang;
-						if (isset($field->options->formatter) && $field->options->formatter !='none'){
+						if (isset($field->options->formatter) && $field->options->formatter !='none' && isset($data[$fieldHandle.'-formatted'][$i] )){
 							$fieldHandle.='-formatted';
+							//data should be already sanitized/formatted
+							$val = $data[$fieldHandle][$i] != ' ' ? $data[$fieldHandle][$i] : '';
+						} else {
+							//covver our ass by sanitizing the data
+							$val = $data[$fieldHandle][$i] != ' ' ?  General::sanitize($data[$fieldHandle][$i]) : '';
 						}
-						$val = $data[$fieldHandle][$i] != ' ' ? $data[$fieldHandle][$i] : '';
 						$node->setValue($val);
 					} else {
 						$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
