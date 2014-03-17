@@ -3,7 +3,9 @@
  * *	@author: Brock Petrie, brockpetrie@gmail.com
  * *	@source: http://github.com/brockpetrie/dynamictextgroup
  * */
-	
+
+.field-dynamictextgroup > div > label { margin-bottom: 2px; }
+
 .field-dynamictextgroup div.frame ul.selection li { padding-right: 0; }
 
 .field-dynamictextgroup div.frame span {

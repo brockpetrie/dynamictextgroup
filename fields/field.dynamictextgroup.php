@@ -56,11 +56,10 @@
 			
 			// Field Editor
 			if ($this->get('id')) {
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery-ui-1.8.16.custom.min.js', 101, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery-ui-1.10.3.custom.min.js', 101, false);
 				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/json2.js', 102, false);
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery.ui.resizable.js', 103, false);
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 104, false);
-				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 105, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 103, false);
+				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 104, false);
 				
 
 				$textFormatterScriptCode = "Symphony.textFormatters = {";
@@ -279,55 +278,64 @@
 			));
 						
 			// Populate existing entries
-			$content = array();
-			if(is_array($data)) {
-				$entryCount = 1;
-				foreach ($data as &$row) {
-					if (!is_array($row)) $row = array($row);
-					if (count($row) > $entryCount) $entryCount = count($row);
-				}
-				
-				for($i=0; $i<$entryCount; $i++) {
-					foreach ($schema as $field) {
-						if ($field->options->type == 'multilingual'){
-							$values = array();
-							foreach (FLang::getLangs() as $lang) {
-								$values[$lang] = $data[$field->handle.'-'.$lang][$i];
-							}
-							$entryValues[$i][] = $values;
-						} else {
-							$entryValues[$i][] = $data[$field->handle][$i];
-						}
+
+			if ($schema != NULL) {
+				$content = array();
+				if(is_array($data)) {
+					$entryCount = 1;
+					foreach ($data as &$row) {
+						if (!is_array($row)) $row = array($row);
+						if (count($row) > $entryCount) $entryCount = count($row);
 					}
+					
+					for($i=0; $i<$entryCount; $i++) {
+						foreach ($schema as $field) {
+							if ($field->options->type == 'multilingual'){
+								$values = array();
+								foreach (FLang::getLangs() as $lang) {
+									$values[$lang] = $data[$field->handle.'-'.$lang][$i];
+								}
+								$entryValues[$i][] = $values;
+							} else {
+								$entryValues[$i][] = $data[$field->handle][$i];
+							}
+						}
+						$list->appendChild(
+							Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], 'dtg', $schema)
+						);
+					}
+				}
+				// Blank entry
+				else {
 					$list->appendChild(
-						Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, $entryValues[$i], 'dtg', $schema)
+						Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'dtg empty', $schema)
 					);
 				}
+				
+				// Add template
+				$template = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema);
+				$template->setAttribute('data-name', 'dynamictextgroup');
+				$template->setAttribute('data-type', 'dynamictextgroup');
+				$list->appendChild($template);
+				
+				
+				// Field label
+				$holder = new XMLElement('div');
+				$label = new XMLElement('label', $this->get('label'));
+				$holder->appendChild($label);
+				
+				$duplicator->appendChild($list);
+				$holder->appendChild($duplicator);
+				
+				if($flagWithError != NULL) $wrapper->appendChild(Widget::Error($holder, $flagWithError));
+				else $wrapper->appendChild($holder);
+			} else {
+				$holder = new XMLElement('div');
+				$label = new XMLElement('label', $this->get('label'));
+				$holder->appendChild($label);
+				
+				$wrapper->appendChild(Widget::Error($holder, "You must define your text groups via the Field Editor before using this field. (You'll find it in this section's blueprint)"));
 			}
-			// Blank entry
-			else {
-				$list->appendChild(
-					Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'dtg empty', $schema)
-				);
-			}
-			
-			// Add template
-			$template = Textgroup::createNewTextGroup($this->get('element_name'), $fieldCount, NULL, 'template empty create', $schema);
-			$template->setAttribute('data-name', 'dynamictextgroup');
-			$template->setAttribute('data-type', 'dynamictextgroup');
-			$list->appendChild($template);
-			
-			
-			// Field label
-			$holder = new XMLElement('div');
-			$label = new XMLElement('label', $this->get('label'));
-			$holder->appendChild($label);
-			
-			$duplicator->appendChild($list);
-			$holder->appendChild($duplicator);
-			
-			if($flagWithError != NULL) $wrapper->appendChild(Widget::wrapFormElementWithError($holder, $flagWithError));
-			else $wrapper->appendChild($holder);
 		}
 		
 		
