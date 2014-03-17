@@ -459,7 +459,14 @@
 		}
 		
 
-		public function prepareImportValue($data, $entry_id = null){
+		public function getImportModes(){
+			//only support array data
+			return array(
+				'getPostdata' =>	ImportableField::ARRAY_VALUE
+			);
+		}
+
+		public function prepareImportValue($data, $mode, $entry_id = null){
 			$schema = json_decode($this->get('schema'));
 
 			$xml = simplexml_load_string($data[0]);
