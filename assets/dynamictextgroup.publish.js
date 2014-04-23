@@ -54,10 +54,9 @@
 			var $self = $(this);
 
 			// Custom selects
-			$('.dtg .styled').each(function() {
-				$(this).select2({allowClear: true}).removeClass('styled');
+			$('.dtg select.styled').each(function() {
+				$(this).select2().removeClass('styled');
 			});
-			customSelect('.dtg');
 
 			// Set errors
 			$self.find('input.invalid').parents('span.fields').addClass('invalid');

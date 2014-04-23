@@ -1,7 +1,7 @@
 <?php
 
-	/* * * 	@package dynamictextgroup 																				* * */
-	/* * * 	This field provides a method to dynamically add a text field or text field groups to a section entry 	* * */
+	/* * *	@package dynamictextgroup																				* * */
+	/* * *	This field provides a method to dynamically add a text field or text field groups to a section entry	* * */
 
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 
@@ -68,9 +68,6 @@
 
 				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div class="dtg-stageholder frame empty"><ol class="dtg-stage"></ol><div class="dtg-messages"></div><button class="dtg-add">Add Field</button><br clear="all" /></div>'.$tblocks);
 				$wrapper->appendChild($fieldset);
-
-
-				//<a class="dtgButton" id="add">Add Field</a>
 			} else {
 				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend>Please save the section to enable the Field Editor.<br />');
 				$wrapper->appendChild($fieldset);
@@ -78,10 +75,10 @@
 
 			// Options
 			$fieldset = new XMLElement('fieldset', '<legend>Options</legend>');
-	        $checkbox = Widget::Input('fields[' . $this->get('sortorder') . '][allow_multiple]', 'yes', 'checkbox');
-	        if($this->get('allow_multiple') == 1) $checkbox->setAttribute('checked', 'checked');
-	        $setting = new XMLElement('label', __('%s Allow creation of new items', array($checkbox->generate())), array('class' => 'column'));
-	        $fieldset->appendChild($setting);
+			$checkbox = Widget::Input('fields[' . $this->get('sortorder') . '][allow_multiple]', 'yes', 'checkbox');
+			if($this->get('allow_multiple') == 1) $checkbox->setAttribute('checked', 'checked');
+			$setting = new XMLElement('label', __('%s Allow creation of new items', array($checkbox->generate())), array('class' => 'column'));
+			$fieldset->appendChild($setting);
 			$wrapper->appendChild($fieldset);
 
 			// General
@@ -157,8 +154,8 @@
 
 		function __alterTable($mode, $col, $rename=NULL) {
 			// Function $mode options:
-			// 0 = Delete column; 	e.g.  __alterTable(0, 'badcolumn');
-			// 1 = Add column; 		e.g.  __alterTable(1, 'newcolumn');
+			// 0 = Delete column;	e.g.  __alterTable(0, 'badcolumn');
+			// 1 = Add column;		e.g.  __alterTable(1, 'newcolumn');
 			// 2 = Rename column;	e.g.  __alterTable(2, 'newcolumnname', 'oldcolumnname');
 			switch ($mode) {
 				case 0:
@@ -318,7 +315,7 @@
 								$emptyRow = false;
 								$empty = false;
 							}
-							if ($i == $entryCount-1  &&  $entryCount > 0  &&  !$checkItems[$f]  &&  $req  &&  !$empty) {
+							if ($i == $entryCount-1	 &&	 $entryCount > 0  &&  !$checkItems[$f]	&&	$req  &&  !$empty) {
 								$badCheck[] = array('handle' => $field->handle.'-holder');
 							}
 							break;
@@ -330,7 +327,7 @@
 								$emptyRow = false;
 								$empty = false;
 							}
-							if ($i == $entryCount-1  &&  $entryCount > 0  &&  !$radioItems[$f]  &&  $req  &&  !$empty) {
+							if ($i == $entryCount-1	 &&	 $entryCount > 0  &&  !$radioItems[$f]	&&	$req  &&  !$empty) {
 								$badRadio[] = array('handle' => $field->handle.'-holder');
 							}
 							break;
@@ -451,7 +448,7 @@
 		/*
 		**	Accepted filter:
 		**	handle:value	(e.g. first-name:Brock)
-		**  Where 'handle' is equal to the handle of a subfield, and 'value' is equal to the input of said subfield. All entries with a matching value in this subfield will be returned.
+		**	Where 'handle' is equal to the handle of a subfield, and 'value' is equal to the input of said subfield. All entries with a matching value in this subfield will be returned.
 		*/
 		public function buildDSRetrievalSQL($data, &$joins, &$where, $andOperation = false) {
 			$field_id = $this->get('id');
