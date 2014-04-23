@@ -6,13 +6,13 @@
 
 .frame { overflow: visible !important; }
 
-.field-dynamictextgroup #stageHolder {
+.field-dynamictextgroup .dtg-stageholder {
 	height: 67px;
 	margin-bottom: 18px;
 	position: relative;
 	overflow: visible;
 	}
-.field-dynamictextgroup #stage {
+.field-dynamictextgroup .dtg-stage {
 	width: 100%;
 	float: left;
 	position: absolute;
@@ -233,7 +233,7 @@
 			
 
 
-.field-dynamictextgroup button#add {
+.field-dynamictextgroup button.dtg-add {
 	float:right;
 	position:absolute;
 	right:0px;
@@ -281,7 +281,7 @@
 			color:#fff;
 			}
 	
-#messages {
+.dtg-messages {
 	float:left;
 	position:absolute;
 	left:7px;

@@ -60,19 +60,19 @@
 				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 103, false);
 				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 104, false);
 
-				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
+				$tblocks = '<input type="hidden" class="dtg-fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
 				//$tblocks .= '<span>'.$this->get('schema').'</span>';
-				$tblocks .= '<input type="hidden" id="addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
-				$tblocks .= '<input type="hidden" id="delfields" name="fields['.$this->get('sortorder').'][delfields]" value="" />';
-				$tblocks .= '<input type="hidden" id="renfields" name="fields['.$this->get('sortorder').'][renfields]" value="" />';
+				$tblocks .= '<input type="hidden" class="dtg-addfields" name="fields['.$this->get('sortorder').'][addfields]" value="" />';
+				$tblocks .= '<input type="hidden" class="dtg-delfields" name="fields['.$this->get('sortorder').'][delfields]" value="" />';
+				$tblocks .= '<input type="hidden" class="dtg-renfields" name="fields['.$this->get('sortorder').'][renfields]" value="" />';
 
-				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div id="stageHolder" class="frame empty"><ol id="stage"></ol><div id="messages"></div><button id="add">Add Field</button><br clear="all" /></div>'.$tblocks);
+				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend><div class="dtg-stageholder frame empty"><ol class="dtg-stage"></ol><div class="dtg-messages"></div><button class="dtg-add">Add Field</button><br clear="all" /></div>'.$tblocks);
 				$wrapper->appendChild($fieldset);
 
 
 				//<a class="dtgButton" id="add">Add Field</a>
 			} else {
-				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend>Please save the section to enable the Field Editor.<br /><br />');
+				$fieldset = new XMLElement('fieldset', '<legend>Field Editor</legend>Please save the section to enable the Field Editor.<br />');
 				$wrapper->appendChild($fieldset);
 			}
 
