@@ -33,7 +33,7 @@
 			return new XMLElement(
 				'li', 
 				'<header>
-					<h4 class="fields">&nbsp;</h4>
+					<h4 class="fields">&#160;</h4>
 				</header>'. $fields, 
 				array('class' => implode($classes, ' '))
 			);

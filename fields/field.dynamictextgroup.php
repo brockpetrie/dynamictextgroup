@@ -175,15 +175,16 @@
 			}
 		}
 
-
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#displayPublishPanel * * */
 		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
 
 			// Append assets
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.min.js', 101, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 102, false);
-			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
-			Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
+			if(class_exists('Administration')) {
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.min.js', 101, false);
+				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.css', 'screen', 102, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.js', 103, false);
+				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.publish.css', 'screen', 104, false);
+			}
 
 			// Get settings
 			$settings = array('frame');
