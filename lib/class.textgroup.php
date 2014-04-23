@@ -28,13 +28,13 @@
 						break;
 				}
 			}
-			
+
 			// Create element
 			return new XMLElement(
 				'li', 
 				'<header>
-					<span class="fields">' . $fields . '<div class="clear"></span>
-				</header>', 
+					<h4 class="fields">&nbsp;</h4>
+				</header>'. $fields, 
 				array('class' => implode($classes, ' '))
 			);
 		}
