@@ -1,13 +1,20 @@
 <?php
 
-	/* * *	@package dynamictextgroup																				* * */
-	/* * *	This field provides a method to dynamically add a text field or text field groups to a section entry	* * */
+	/**
+	 * @package dynamictextgroup
+	 */
+
+	/** 
+	 * This field provides a method to dynamically add a text field or text field groups to a section entry
+	 */
 
 	if(!defined('__IN_SYMPHONY__')) die('<h2>Symphony Error</h2><p>You cannot directly access this file</p>');
 
 	require_once(EXTENSIONS . '/dynamictextgroup/lib/class.textgroup.php');
+	require_once FACE . '/interface.exportablefield.php';
+	require_once FACE . '/interface.importablefield.php';
 
-	Class fielddynamictextgroup extends Field {
+	Class fielddynamictextgroup extends Field implements ImportableField, ExportableField {
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#__construct * * */
 		function __construct() {
@@ -176,7 +183,7 @@
 		}
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#displayPublishPanel * * */
-		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
+		function displayPublishPanel(XMLElement &$wrapper, $data = null, $flagWithError = null, $fieldnamePrefix = null, $fieldnamePostfix = null, $entry_id = null) {
 
 			// Append assets
 			if(class_exists('Administration')) {
@@ -364,7 +371,7 @@
 
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#processRawFieldData * * */
-		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL) {
+		function processRawFieldData($data, &$status, &$message=null, $simulate=false, $entry_id=null) {
 			$status = self::__OK__;
 			if(!is_array($data)) return NULL;
 
@@ -414,13 +421,13 @@
 				`entry_id` int(11) unsigned NOT NULL,
 				PRIMARY KEY (`id`),
 				KEY `entry_id` (`entry_id`)
-				);"
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
 			);
 		}
 
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#prepareTableValue * * */
-		function prepareTableValue($data, XMLElement $link=NULL) {
+		function prepareTableValue($data, XMLElement $link = null, $entry_id = null) {
 			if (is_array($data)) {
 				$keys = array_keys($data);
 				$key = $keys[0];
@@ -486,7 +493,7 @@
 
 
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#appendFormattedElement * * */
-		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id = null) {
+		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = null, $entry_id = null) {
 			// Get field properties and decode schema
 			$fieldCount = $this->get('fieldcount');
 			$schema = json_decode($this->get('schema'));
@@ -538,5 +545,46 @@
 			$note = new XMLElement('strong', 'IMPORTANT: the event sample code is not updated when you make changes to DynamicTextGroup subfields in the section editor. Remember that your front-end fields must always match the back-end fields!');
 			foreach ($schema as $field) $label->appendChild(Widget::Input('fields['.$this->get('element_name').']['.$field->handle.'][]'));
 			return $label;
+		}
+
+	/*-------------------------------------------------------------------------
+		Import:
+	-------------------------------------------------------------------------*/
+
+		public function getImportModes() {
+			return array(
+				'getPostdata' =>	ImportableField::ARRAY_VALUE
+			);
+		}
+
+		public function prepareImportValue($data, $mode, $entry_id = null) {
+			$message = $status = null;
+			$modes = (object)$this->getImportModes();
+
+			if($mode === $modes->getPostdata) {
+				return $this->processRawFieldData($data, $status, $message, true, $entry_id);
+			}
+
+			return null;
+		}
+
+	/*-------------------------------------------------------------------------
+		Export:
+	-------------------------------------------------------------------------*/
+
+		public function getExportModes() {
+			return array(
+				'getPostdata' =>	ExportableField::POSTDATA
+			);
+		}
+
+		public function prepareExportValue($data, $mode, $entry_id = null) {
+			$modes = (object)$this->getExportModes();
+
+			if($mode === $modes->getPostdata) {
+				return $data;
+			}
+
+			return null;
 		}
 	}
