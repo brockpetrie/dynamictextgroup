@@ -1,4 +1,4 @@
-/* * 	
+/* *
 * *	Dynamic Text Group — Field Editor styling
 * *	@author: Brock Petrie, brockpetrie@gmail.com
 * *	@source: http://github.com/brockpetrie/dynamictextgroup
@@ -6,13 +6,13 @@
 
 .frame { overflow: visible !important; }
 
-.field-dynamictextgroup #stageHolder {
+.field-dynamictextgroup .dtg-stageholder {
 	height: 67px;
 	margin-bottom: 18px;
 	position: relative;
 	overflow: visible;
 	}
-.field-dynamictextgroup #stage {
+.field-dynamictextgroup .dtg-stage {
 	width: 100%;
 	float: left;
 	position: absolute;
@@ -24,7 +24,7 @@
 	width: 100%;
 	float: left;
 	}
-	
+
 	.field-dynamictextgroup .inner {
 		padding: 5px 25px 5px 15px;
 		margin: 8px 4px;
@@ -36,7 +36,7 @@
 		box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05);
 		box-sizing: border-box;
 		}
-		
+
 	.field-dynamictextgroup .box span {
 		position: relative;
 		}
@@ -70,11 +70,11 @@
 		outline: none;
 		opacity: 1;
 		}
-		
+
 	.field-dynamictextgroup .box.error .inner { background:#FFEFED; }
 	.field-dynamictextgroup .box.error .tfield { color:#d43; }
-	
-	
+
+
 	.field-dynamictextgroup .handle {
 		height: 100%;
 		width: 15px;
@@ -158,7 +158,7 @@
 		left:0; top:0; position:absolute;
 		background:url(images/shadow.png) left no-repeat;
 		}
-		
+
 	.optiondrop li {
 		font-family: 'Lucida Grande', Leelawadee, Tahoma, Verdana, sans-serif;
 		list-style:none;
@@ -172,7 +172,7 @@
 		margin:0;
 		padding:0;
 		}
-		
+
 	.optiondrop select, .optiondrop input[type='text'] {
 		margin-top:5px;
 		}
@@ -230,10 +230,10 @@
 			-webkit-box-shadow:0 1px 4px #ccc;
 			box-shadow:0 1px 4px #ccc;
 			}
-			
 
 
-.field-dynamictextgroup button#add {
+
+.field-dynamictextgroup button.dtg-add {
 	float:right;
 	position:absolute;
 	right:0px;
@@ -242,7 +242,7 @@
 	}
 
 
-		
+
 .ui-resizable { position: relative;}
 .ui-resizable-handle {
 	position: absolute;font-size: 0.1px;z-index: 99999; display: block;
@@ -252,36 +252,7 @@
 .ui-resizable-disabled .ui-resizable-e { display:none; }
 
 
-
-.dtgButton {
-	background-color:#000;
-	color:#FFF;
-	cursor:pointer;
-	padding:.4em 1em .5em 1em;
-	line-height:2em;
-	font:10px/11px 'Lucida Grande', Leelawadee, Tahoma, Verdana, sans-serif;
-	border-radius:1em;
-	-moz-border-radius:1em;
-	-webkit-border-radius:1em;
-	text-decoration:none;
-	display:block;
-	text-align:center;
-	}
-	.dtgButton:hover {
-		background-color:#FFF;
-		color:#000;
-		}
-
-	.dtgButton.del {
-		font-size:.8em;
-		background:#d43;
-		}
-		.dtgButton.del:hover {
-			background:#cf3120;
-			color:#fff;
-			}
-	
-#messages {
+.dtg-messages {
 	float:left;
 	position:absolute;
 	left:7px;
