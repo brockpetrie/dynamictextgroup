@@ -61,14 +61,15 @@
 			renames.handles = [];
 			
 			$(".box", "#stage").each(function() {
+				var $this = $(this);
 				var field = {};
 				field.label = $('.tfield', $(this)).val();
 				field.width = Math.round(dtgEditor.parseWidth($(this).innerWidth())*10)/10;
 				field.options = {};
-				field.options.required = $('input[name="required"]', $(this)).is('checked');
-				field.options.multiline = $('input[name="multiline"]', $(this)).is('checked');
-				field.options.formatter = $('select[name="fieldFormatter"]', $(this)).val();
-				field.options.type = $('#fieldType', $(this)).val();
+				field.options.required = $this.find('input[name="required"]', $(this)).is(':checked');
+				field.options.multiline = $this.find('input[name="multiline"]', $(this)).is(':checked');
+				field.options.formatter = $this.find('select[name="fieldFormatter"]', $(this)).val();
+				field.options.type = $this.find('#fieldType', $(this)).val();
 				//if (field.options.type == 'select') field.options.selectItems = $('#selectItems', $(this)).val();
 				if (field.options.type == 'select') {
 					var str = $('#customSelect', $(this)).val();
@@ -216,6 +217,8 @@
 					case 'text':
 						$(validationRuleHolder).show();
 						$(validationRule).val(fOpts.validationRule);
+						$(fieldFormatterHolder).show();
+						$(multilineBoxHolder).show();
 						break;
 					case 'multilingual':
 						$(validationRuleHolder).show();
@@ -247,6 +250,8 @@
 						break;
 					case 'text':
 						$(validationRuleHolder).slideDown(250);
+						$(fieldFormatterHolder).slideDown(250);
+						$(multilineBoxHolder).slideDown(250);
 						break;
 					case 'checkbox':
 						break;

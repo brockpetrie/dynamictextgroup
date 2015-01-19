@@ -6,19 +6,25 @@
 	<url type="discuss">http://symphony-cms.com/discuss/thread/70781/</url>
 	<types>
 		<type>Field Types</type>
+		<type>Multilingual</type>
 	</types>
 	<authors>
 		<author>
 			<name github="brockpetrie" symphony="brockpetrie">Brock Petrie</name>
 			<website>http://www.brockpetrie.com</website>
 		</author>
+		<author>
+			<name github="jonmifsud" symphony="gunglien">Jon Mifsud</name>
+			<website>http://jonmifsud.com</website>
+		</author>
 	</authors>
-	<dependencies>
-		<dependency>stage</dependency>
-	</dependencies>
 	<releases>
+		<release version="3.1" date="2015-01-19" min="2.3.0">
+			- Added support for Text Formatters and Text Areas
+			- Added support for Multilanguage interfaces (requires Frontend Localisation)
+		</release>
 		<release version="3.0" date="2012-10-28" min="2.3.0">3.0 development</release>
-		<release version="2.0" date="2012-10-28" min="2.2.0">2.0 release</release>
+		<release version="2.0" date="2012-10-28" min="2.2.0" max='2.2.x'>2.0 release</release>
 		<release version="1.0" date="2011-06-05" min="2.2.0">Initial release</release>
 	</releases>
 	<media>

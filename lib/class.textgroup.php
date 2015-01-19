@@ -14,7 +14,7 @@
 				$fieldVal = ($values != NULL && $values[$i] != ' ') ? $values[$i] : NULL;
 				switch ($schema[$i]->options->type) {
 					case 'text':
-						$fields .= self::__createTextField($element, $schema[$i]->handle, $fieldVal, $schema[$i]->label, $schema[$i]->width, $schema[$i]->options->required);
+						$fields .= self::__createTextField($element, $schema[$i]->handle, $fieldVal, $schema[$i]->label, $schema[$i]->width, $schema[$i]->options->required, $schema[$i]->options->multiline);
 						break;
 					case 'multilingual':
 						$fields .= self::__createMultilingualTextField($element, $schema[$i]->handle, $fieldVal, $schema[$i]->label, $schema[$i]->width, $schema[$i]->options->required, $schema[$i]->options->multiline);
@@ -41,13 +41,18 @@
 			);
 		}
 		
-		private static function __createTextField($element, $handle, $textvalue, $label=NULL, $width=NULL, $required=NULL) {
+		private static function __createTextField($element, $handle, $textvalue, $label=NULL, $width=NULL, $required=NULL,$multiline=NULL) {
 			// Generate text field
 			$width = 'style="width:'. $width .'% !important;"';
 			$reqLabelAppendage = $required ? ' <span class="req">*</span>' : '';
 			$reqclas .= $required ? ' req' : '';
 			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
-			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl .'<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle .'][]" value=\''. $textvalue .'\' placeholder="'. $label .'" class="field-'. $handle .'" /></span>';
+			$input = '';
+			if (!isset($multiline) || !$multiline)
+				$input.='<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle . '][]" value=\''. trim($value[$lang]) .'\' placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" />';
+			else 
+				$input.='<textarea type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle . '][]" placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" rows="4" >'.trim($value[$lang]).'</textarea>';
+			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl . $input . '</span>';
 		}
 
 		private static function __createMultilingualTextField($element, $handle, $value, $label=NULL, $width=NULL, $required=NULL,$multiline=NULL) {

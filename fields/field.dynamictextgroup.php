@@ -56,10 +56,10 @@
 			
 			// Field Editor
 			if ($this->get('id')) {
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery-ui-1.10.3.custom.min.js', 101, false);
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/json2.js', 102, false);
-				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 103, false);
-				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 104, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/jquery-ui-1.10.3.custom.min.js', 2101, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/json2.js', 2102, false);
+				Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.js', 2103, false);
+				Administration::instance()->Page->addStylesheetToHead(URL . '/extensions/dynamictextgroup/assets/dynamictextgroup.fieldeditor.css', 'screen', 2104, false);
 				
 
 				$textFormatterScriptCode = "Symphony.textFormatters = {";
@@ -72,7 +72,7 @@
 
 				$textFormatterScript = new XMLElement('script',$textFormatterScriptCode,array('type'=>'text/javascript'));
 
-				Administration::instance()->Page->addElementToHead($textFormatterScript, 106, false);
+				Administration::instance()->Page->addElementToHead($textFormatterScript, 2106, true);
 
 				
 				$tblocks = '<input type="hidden" id="fieldschema" name="fields['.$this->get('sortorder').'][schema]" value=\''.$this->get('schema').'\' />';
@@ -700,7 +700,7 @@
 							//data should be already sanitized/formatted
 							$val = $data[$fieldHandle][$i] != ' ' ? $data[$fieldHandle][$i] : '';
 						} else {
-							//covver our ass by sanitizing the data
+							//cover our ass by sanitizing the data
 							$val = $data[$fieldHandle][$i] != ' ' ?  General::sanitize($data[$fieldHandle][$i]) : '';
 						}
 						$node->setValue($val);
