@@ -49,9 +49,9 @@
 			$lbl = '<label style="display:none;" for="fields[' . $element . '][' . $handle . '][]">' . $label . $reqLabelAppendage . '</label>';
 			$input = '';
 			if (!isset($multiline) || !$multiline)
-				$input.='<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle . '][]" value=\''. trim($value[$lang]) .'\' placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" />';
+				$input.='<input type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle . '][]" value=\''. trim($textvalue) .'\' placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" />';
 			else 
-				$input.='<textarea type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle . '][]" placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" rows="4" >'.trim($value[$lang]).'</textarea>';
+				$input.='<textarea type="text" id="field-'. $handle .'" name="fields['. $element .']['. $handle . '][]" placeholder="' . $lang . ' ' . $label .'" class="field-'. $handle . ' ' . $lang .'" rows="4" >'.trim($textvalue).'</textarea>';
 			return '<span class="fieldHolder '. $handle .'-holder'.$reqclas.'" '. $width .'>'. $lbl . $input . '</span>';
 		}
 
