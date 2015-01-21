@@ -462,56 +462,60 @@
 		public function getImportModes(){
 			//only support array data
 			return array(
-				'getPostdata' =>	ImportableField::ARRAY_VALUE
+				'getPostdata' =>	ImportableField::ARRAY_VALUE,
+				'xml' =>	ImportableField::STRING_VALUE
 			);
 		}
 
 		public function prepareImportValue($data, $mode, $entry_id = null){
-			$schema = json_decode($this->get('schema'));
 
-			$xml = simplexml_load_string($data[0]);
+			if ($mode == $this->getImportModes()['xml']){
+			
+				$schema = json_decode($this->get('schema'));
 
-			$result = array();
-			foreach ($schema as $field) {
-				$handle = $field->handle;
-				if ($field->options->type=='multilingual'){
-					if (!class_exists(FLang)){
-						$flExt = ExtensionManager::create('frontend_localisation');
-					}
-					$langs = FLang::getLangs();
-					//initialize frontend localisation as not initiated
-					if (empty($langs)){
-						$flExt = ExtensionManager::create('frontend_localisation');
-						$flExt->dFrontendInitialised();
-						$langs = FLang::getLangs();
-					}
-					foreach( $langs as $lang ){
-						$result[$handle.'-'.$lang] = array();
-					}
-				} else {
-					$result[$handle] = array();
-				}
-			}
-
-			// var_dump($schema);
-
-			foreach ($xml->xpath('item') as $item) {
+				$result = array();
 				foreach ($schema as $field) {
 					$handle = $field->handle;
 					if ($field->options->type=='multilingual'){
+						if (!class_exists(FLang)){
+							$flExt = ExtensionManager::create('frontend_localisation');
+						}
+						$langs = FLang::getLangs();
+						//initialize frontend localisation as not initiated
+						if (empty($langs)){
+							$flExt = ExtensionManager::create('frontend_localisation');
+							$flExt->dFrontendInitialised();
+							$langs = FLang::getLangs();
+						}
 						foreach( $langs as $lang ){
-							$langHandle = $handle.'-'.$lang;
-							// var_dump($item->$langHandle);
-							$result[$langHandle][] = (string)$item->$langHandle;
+							$result[$handle.'-'.$lang] = array();
 						}
 					} else {
-						// var_dump($item->$handle);
-						$result[$handle][] = (string)$item->$handle;
+						$result[$handle] = array();
 					}
 				}
+
+				if (is_array($data)) $data = current($data);
+				
+				$xml = simplexml_load_string($data);
+
+				foreach ($xml->xpath('item') as $item) {
+					foreach ($schema as $field) {
+						$handle = $field->handle;
+						if ($field->options->type=='multilingual'){
+							foreach( $langs as $lang ){
+								$langHandle = $handle.'-'.$lang;
+								$result[$langHandle][] = (string)$item->$langHandle;
+							}
+						} else {
+							$result[$handle][] = (string)$item->$handle;
+						}
+					}
+				}
+			} else {
+				$result = $data;
 			}
-			// var_dump($result);die;
-			
+
 			return $result;
 		}
 
