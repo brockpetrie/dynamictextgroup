@@ -560,8 +560,6 @@
 					if (!empty($field[$i]) || $field[$i] == '0') {
 						$empty = false;	
 						$emptyEntry = false;
-						//$field[$i] = str_replace("\"", "&quot;", $field[$i]);
-						$field[$i] = str_replace("'", "&apos;", $field[$i]);
 						$formatter = $fields[$key]->options->formatter;
 						if(!isset($fields[$key]) && isset($fields[substr($key, 0, -3)])){
 							$formatter = $fields[substr($key, 0, -3)]->options->formatter;
@@ -711,6 +709,14 @@
 					} else {
 						$val = $data[$field->handle][$i] != ' ' ? General::sanitize($data[$field->handle][$i]) : '';
 						$node->setValue($val);
+
+						if (isset($field->options->formatter) && $field->options->formatter !='none' && isset($data[$field->handle . '-formatted'][$i] )){
+							$fieldHandle = $field->handle . '-formatted';
+							//data should be already sanitized/formatted
+							$val = $data[$fieldHandle][$i];
+							$formattedNode = new XMLElement($field->handle,$val,array('mode'=>'formatted'));
+							$item->appendChild($formattedNode);
+						}
 					}
 					$item->appendChild($node);				
 				}
