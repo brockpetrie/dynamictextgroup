@@ -557,20 +557,23 @@
 			for($i=0; $i < $entryCount; $i++) {
 				$emptyEntry = true;
 				foreach ($data as $key => &$field) {
+
+					//set formatter
+					$formatter = $fields[$key]->options->formatter;
+					if(!isset($fields[$key]) && isset($fields[substr($key, 0, -3)])){
+						$formatter = $fields[substr($key, 0, -3)]->options->formatter;
+					}
+
 					if (!empty($field[$i]) || $field[$i] == '0') {
 						$empty = false;	
 						$emptyEntry = false;
-						$formatter = $fields[$key]->options->formatter;
-						if(!isset($fields[$key]) && isset($fields[substr($key, 0, -3)])){
-							$formatter = $fields[substr($key, 0, -3)]->options->formatter;
-						}
 						if (isset($formatter) && $formatter!='none'){
 							$data[$key.'-formatted'][$i] = $this->applyFormatting($field[$i],$formatter);
 						}
 					} else {
 						$field[$i] = ' ';
 						if (isset($formatter) && $formatter!='none'){
-							$data[$key.'-formatted'][$i] =' ';
+							$data[$key.'-formatted'][$i] = ' ';
 						}
 					}
 				}
@@ -586,7 +589,6 @@
 			} else {
 				return $data;
 			}
-
 		}
 	
 	
