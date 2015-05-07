@@ -564,7 +564,9 @@
 						$formatter = $fields[substr($key, 0, -3)]->options->formatter;
 					}
 
-					if (!empty($field[$i]) || $field[$i] == '0') {
+					$trimmed = trim($field[$i]);
+
+					if (!empty($trimmed) || $field[$i] == '0') {
 						$empty = false;	
 						$emptyEntry = false;
 						if (isset($formatter) && $formatter!='none'){
