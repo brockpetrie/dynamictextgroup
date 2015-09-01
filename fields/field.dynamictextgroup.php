@@ -551,8 +551,6 @@
 			foreach ($schema as $key => $field) {
 				$fields[$field->handle] = $field;
 			}
-			// var_dump($fields);die;
-			// var_dump($data);die;
 			
 			for($i=0; $i < $entryCount; $i++) {
 				$emptyEntry = true;
@@ -639,7 +637,7 @@
 		**	handle:value	(e.g. first-name:Brock)
 		**  Where 'handle' is equal to the handle of a subfield, and 'value' is equal to the input of said subfield. All entries with a matching value in this subfield will be returned.
 		*/
-		public function buildDSRetrivalSQL($data, &$joins, &$where, $andOperation = false) {
+		public function buildDSRetrievalSQL($data, &$joins, &$where, $andOperation = false) {
 			$field_id = $this->get('id');
 			
 			if (preg_match('/.*:.*/', $data[0])) {
