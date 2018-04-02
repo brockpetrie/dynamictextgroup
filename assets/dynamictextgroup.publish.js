@@ -59,7 +59,7 @@
 			$('.fieldtype-'+type).each(function() {
 				var checker = $('input[type="'+type+'"]', $(this));
 				var checkData = $('input[type="hidden"]', $(this));
-				if ($(checker).attr('checked')) {
+				if ($(checker).prop('checked')) {
 					$(checkData).val('yes');
 				} else {
 					$(checkData).val('');
