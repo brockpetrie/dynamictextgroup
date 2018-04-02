@@ -49,7 +49,7 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#displaySettingsPanel * * */
-		function displaySettingsPanel(&$wrapper, $errors=NULL) {
+		function displaySettingsPanel(XMLElement &$wrapper, $errors=NULL) {
 			
 			// Initialize field settings based on class defaults (name, placement)
 			parent::displaySettingsPanel($wrapper, $errors);
@@ -110,7 +110,7 @@
 		
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#checkFields * * */
-		function checkFields(&$errors, $checkForDuplicates=true) {
+		function checkFields(array &$errors, $checkForDuplicates = true) {
 			parent::checkFields($errors, $checkForDuplicates);
 		}
 	
@@ -249,7 +249,7 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#displayPublishPanel * * */
-		function displayPublishPanel(&$wrapper, $data=NULL, $flagWithError=NULL, $fieldnamePrefix=NULL, $fieldnamePostfix=NULL) {
+		function displayPublishPanel(XMLElement &$wrapper, $data = NULL, $flagWithError = NULL, $fieldnamePrefix = NULL, $fieldnamePostfix = NULL, $entry_id = NULL) {
 	
 			// Append assets
 			Administration::instance()->Page->addScriptToHead(URL . '/extensions/dynamictextgroup/assets/select2/select2.min.js', 101, false);
@@ -532,7 +532,7 @@
 		}
 		
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#processRawFieldData * * */
-		function processRawFieldData($data, &$status, $simulate=false, $entry_id=NULL) {
+		function processRawFieldData($data, &$status, &$message = NULL, $simulate = false, $entry_id = NULL) {
 			$status = self::__OK__;
 			if(!is_array($data)) return NULL;
 			
@@ -606,7 +606,7 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#prepareTableValue * * */
-		function prepareTableValue($data, XMLElement $link=NULL) {
+		function prepareTableValue($data, XMLElement $link = NULL, $entry_id = NULL) {
 			if (is_array($data)) {
 				$keys = array_keys($data);
 				$key = $keys[0];
@@ -672,7 +672,7 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#appendFormattedElement * * */
-		public function appendFormattedElement(&$wrapper, $data, $encode = false, $mode = null, $entry_id = null) {
+		public function appendFormattedElement(XMLElement &$wrapper, $data, $encode = false, $mode = NULL, $entry_id = NULL) {
 			// Get field properties and decode schema
 			$fieldCount = $this->get('fieldcount');
 			$schema = json_decode($this->get('schema'));
