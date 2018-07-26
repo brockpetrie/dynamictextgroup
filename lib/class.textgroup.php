@@ -88,7 +88,7 @@
 				$items = '';
 				if (is_string($options->selectItems)) {
 					$items = explode(',', $options->selectItems);
-					$obj = '';
+					$obj = [];
 					foreach ($items as $item) {
 						$obj[] = (object) array('id' => trim($item), 'text' => trim($item));
 					}
