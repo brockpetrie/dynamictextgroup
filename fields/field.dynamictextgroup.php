@@ -346,7 +346,11 @@
 			$schema = json_decode($this->get('schema'));
 			
 			$sampling = $schema[0]->handle;
-			$entryCount = count($data[$sampling]);
+			if (is_array($data[$sampling])){
+				$entryCount = count($data[$sampling]);
+			} else {
+				$entryCount = 1;
+			}
 			
 			$empty = true;
 			
@@ -541,7 +545,13 @@
 			
 			// Check for the field with the most values
 			$entryCount = 0;
-			foreach ($data as $row) if (count($row) > $entryCount) $entryCount = count($row);
+			foreach ($data as $row) {
+				if (is_array($row) && count($row) > $entryCount){
+					$entryCount = count($row);
+				} else if ($entryCount == 0) {
+					$entryCount = 1;
+				}
+			}
 			
 			// Check for empties
 			$empty = true;
@@ -579,7 +589,9 @@
 				}
 				if ($emptyEntry) {
 					foreach ($data as &$field) {
-						unset($field[$i]);
+						if (is_array($field)){
+							unset($field[$i]);
+						}
 					}
 				}
 			}
@@ -677,7 +689,9 @@
 			$fieldCount = $this->get('fieldcount');
 			$schema = json_decode($this->get('schema'));
 			$sampling = $schema[0]->handle;
-			$entryCount = count($data[$sampling]);
+			if (is_array($data[$sampling])){
+				$entryCount = count($data[$sampling]);
+			}
 				
 			// Parse data
 			$textgroup = new XMLElement($this->get('element_name'));
