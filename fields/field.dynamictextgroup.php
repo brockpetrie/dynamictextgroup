@@ -640,6 +640,16 @@
 		
 		function buildSortingSQL(&$joins, &$where, &$sort, $order='ASC') {
 			$field_id = $this->get('id');
+			$schema = json_decode($this->get('schema'));
+
+			$fieldHandles = array();
+			foreach ($schema as $k => $v) {
+			    $fieldHandles[$k] = $v->handle;
+			}
+			if (!in_array('sort-value', $fieldHandles) || !in_array('value', $fieldHandles)){
+				$sort = " RAND()";
+				return true;
+			}
 		
 			$joins .= "
 				LEFT JOIN
@@ -659,7 +669,7 @@
 			";
 
 			$sort = "
-				ORDER BY `t{$field_id}_{$this->_key}`.`value`
+				`t{$field_id}_{$this->_key}`.`value`
 			";
 
 			return true;
