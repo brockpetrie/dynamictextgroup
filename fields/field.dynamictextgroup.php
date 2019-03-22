@@ -637,10 +637,34 @@
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#buildSortingSQL * * */
-		/*
+		
 		function buildSortingSQL(&$joins, &$where, &$sort, $order='ASC') {
+			$field_id = $this->get('id');
+		
+			$joins .= "
+				LEFT JOIN
+					`tbl_entries_data_{$field_id}` AS t{$field_id}_{$this->_key}
+				ON
+					(e.id = t{$field_id}_{$this->_key}.entry_id)
+			";
+			
+			$data[0] = explode(':', trim($this->cleanValue($data[0])));
+			$handle = $data[0][0];
+			$value = $data[0][1];
+			
+			$where .= "
+				AND (
+					`t{$field_id}_{$this->_key}`.`key` = 'sort-value'
+				)
+			";
+
+			$sort = "
+				ORDER BY `t{$field_id}_{$this->_key}`.`value`
+			";
+
+			return true;
 		}
-		*/
+		
 	
 	
 		/* * * @see http://symphony-cms.com/learn/api/2.2/toolkit/field/#buildDSRetrivalSQL * * */
