@@ -572,6 +572,13 @@
 						$formatter = $fields[substr($key, 0, -3)]->options->formatter;
 					}
 
+					// set blank checkboxes to no
+					if ($fields[$key]->options->type == 'checkbox'){
+						if (!$field[$i]){
+							$field[$i] = "no";
+						}
+					}
+
 					$trimmed = trim($field[$i]);
 
 					if (!empty($trimmed) || $field[$i] == '0') {
